@@ -1,3 +1,4 @@
+import events.GameOnEvent;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 
@@ -7,6 +8,7 @@ public class Main {
 
         JDA jda = new JDABuilder(args[0]).build();
 
+        jda.addEventListener(new GameOnEvent());
     }
 }
 
