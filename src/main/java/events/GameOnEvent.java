@@ -27,7 +27,7 @@ public class GameOnEvent extends ListenerAdapter {
                 players.addAll(mentioned);
                 GameX01 g = new GameX01(event.getChannel(), players);
                 GameManager.getInstance().addGameX01(g.getChannel(),g);
-
+                //todo check if already game running in the channel
                 //Send message about players and channel of this game
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append("Playing a game of 501 double out\n<@").append(event.getMessage().getAuthor().getId());

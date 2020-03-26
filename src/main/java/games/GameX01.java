@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -55,27 +56,58 @@ public class GameX01 {
     }
 
     public void score(int points, User u){
-        User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+         User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
          if (u != nextPlayer){
              channel.sendMessage("It's <@").append(nextPlayer.getId()).append(">'s turn to throw. Please wait.").queue();
          } else {
              // todo determine average
+             //todo overthrown if 1
              // substract the points from the remaining score and send message
              // check if overthrown or game shot
              int remaining = scores.get(nextPlayer);
-             if (points == remaining){
-                 channel.sendMessage("Finish the game by typing \"check\" and the number of darts needed, e.g. \"check 2.\n " +
-                         "You can also type \"c1\", \"c2\" or \"c3\" to save time.").queue();
-             } else if (points > remaining){
-                 channel.sendMessage("Busted! Remaining: ").append(String.valueOf(remaining)).queue();
-                 determineNext();
+             // Check if points is valid and substract from current score if not checkout or overthrown.
+             if( points>180 || Arrays.stream(new int[]{163,166,169,172,173,175,176,178,179}).anyMatch(impossible-> impossible == points) ){
+                 channel.sendMessage("This score cannot be achieved with three darts. Please submit the correct value.").queue();
              } else {
-                 //todo check if score is valid
-                 scores.put(nextPlayer, scores.get(nextPlayer) - points);
-                 channel.sendMessage("Remaining: ").append(scores.get(nextPlayer).toString()).queue();
-                 determineNext();
+                 if (points == remaining) {
+                     channel.sendMessage("Finish the game by typing \"check\" and the number of darts needed, e.g. \"check 2.\n " +
+                             "You can also type \"c1\", \"c2\" or \"c3\" to save time.").queue();
+                 } else if (points > remaining || points == remaining-1) {
+                     channel.sendMessage("Busted! Remaining: ").append(String.valueOf(remaining)).queue();
+                     determineNext();
+                     nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+                     channel.sendMessage("Next player: <@").append(nextPlayer.getId()).append(">").queue();
+                 } else {
+                     scores.put(nextPlayer, scores.get(nextPlayer) - points);
+                     //todo anounce next
+                     channel.sendMessage("Remaining: ").append(scores.get(nextPlayer).toString()).queue();
+                     determineNext();
+                     nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+                     channel.sendMessage("Next player: <@").append(nextPlayer.getId()).append(">").queue();
+                 }
              }
          }
+    }
+
+    // end game with checkout
+    // validate if score is possible with the given amount of darts
+    public void check(int darts, User u){
+        User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+        if (u != nextPlayer){
+            channel.sendMessage("It's <@").append(nextPlayer.getId()).append(">'s turn to throw. Please wait.").queue();
+        } else {
+            int rem = scores.get(nextPlayer);
+            if (darts == 1 && rem<41 && rem%2==0){
+                channel.sendMessage("GAME SHOT by <@").append(nextPlayer.getId()).append("> with the first dart").queue();
+            } else if (darts == 2 && (rem<99 || Arrays.stream(new int[]{100,101,104,107,110}).anyMatch(notbogey-> notbogey == rem))){
+                channel.sendMessage("GAME SHOT by <@").append(nextPlayer.getId()).append("> with the second dart").queue();
+            } else if (darts == 3 && (rem<159 || Arrays.stream(new int[]{170,167,164,161,160}).anyMatch(notbogey-> notbogey == rem))){
+                channel.sendMessage("GAME SHOT by <@").append(nextPlayer.getId()).append("> with the third dart").queue();
+            } else{
+                channel.sendMessage("Your score of ").append(String.valueOf(rem)).append(" cannot be finished with ")
+                        .append(String.valueOf(darts)).append(" darts.").queue();
+            }
+        }
     }
 
     //count from player 0 to last player, then start again

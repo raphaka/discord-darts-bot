@@ -1,3 +1,4 @@
+import events.CheckEvent;
 import events.GameOnEvent;
 import events.ScoreEvent;
 import games.GameX01;
@@ -15,6 +16,7 @@ public class Main {
         jda = new JDABuilder(args[0]).build();
         jda.addEventListener(new GameOnEvent());
         jda.addEventListener(new ScoreEvent());
+        jda.addEventListener(new CheckEvent());
     }
 
     public static JDA getJda(){
