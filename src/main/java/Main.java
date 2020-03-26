@@ -1,7 +1,4 @@
-import events.CheckEvent;
-import events.GameOnEvent;
-import events.QuitEvent;
-import events.ScoreEvent;
+import events.*;
 import games.GameX01;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -19,6 +16,7 @@ public class Main {
         jda.addEventListener(new ScoreEvent());
         jda.addEventListener(new CheckEvent());
         jda.addEventListener(new QuitEvent());
+        jda.addEventListener(new RemainingEvent());
     }
 
     public static JDA getJda(){

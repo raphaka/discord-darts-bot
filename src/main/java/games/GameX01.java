@@ -85,6 +85,32 @@ public class GameX01 {
          }
     }
 
+    public void remaining(int rem, User u){
+        User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+        if (u != nextPlayer){
+            channel.sendMessage("It's <@").append(nextPlayer.getId()).append(">'s turn to throw. Please wait.").queue();
+        } else {
+            int points = scores.get(nextPlayer) - rem;
+            if (points < 0 || points>180 || Arrays.stream(new int[]{163,166,169,172,173,175,176,178,179}).anyMatch(impossible-> impossible == points)){
+                channel.sendMessage("Your score of ").append(String.valueOf(points)).append(" cannot be achieved with three darts. Please correct your input.").queue();
+            } else if (rem == 1 || rem <0){
+                channel.sendMessage("Busted! Remaining: ").append(String.valueOf(rem)).queue();
+                determineNext();
+                nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+                channel.sendMessage("Next player: <@").append(nextPlayer.getId()).append(">").queue();
+            } else if(rem == 0){
+                channel.sendMessage("Finish the game by typing \"check\" and the number of darts needed, e.g. \"check 2.\n " +
+                        "You can also type \"c1\", \"c2\" or \"c3\" to save time.").queue();
+            } else {
+                scores.put(nextPlayer, rem);
+                channel.sendMessage("Remaining: ").append(String.valueOf(rem)).queue();
+                determineNext();
+                nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+                channel.sendMessage("Next player: <@").append(nextPlayer.getId()).append(">").queue();
+            }
+        }
+    }
+
     // end game with checkout
     // validate if score is possible with the given amount of darts
     public void check(int darts, User u){
