@@ -34,6 +34,10 @@ public final class GameManager {
         games.put(t,g);
     }
 
+    public void removeGameX01ByChannel(TextChannel t){
+        games.remove(t);
+    }
+
     public GameX01 getGameByChannel(TextChannel t){
         return games.getOrDefault(t, null);
     }
