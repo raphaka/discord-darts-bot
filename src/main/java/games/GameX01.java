@@ -16,7 +16,7 @@ public class GameX01 {
 
     private TextChannel channel;
     private HashMap<User, Integer> scores = new  HashMap<User, Integer>();
-
+    private int intNextPlayer;
     /*
      * Constructor sets the channel to be used.
      * The category of the channel is Dartboard (will be created if not existing.
@@ -45,14 +45,48 @@ public class GameX01 {
         }
         //todo mechanism for choosing who begins
         Random R = new Random();
-        User first = (User)scores.keySet().toArray()[R.nextInt(scores.keySet().toArray().length)];
-        channel.sendMessage("Starting a new game of 501. <@").append(first.getId()).append("> to throw first.\nGame on.").queue();
+        intNextPlayer = R.nextInt(scores.keySet().toArray().length);
+        User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+        channel.sendMessage("Starting a new game of 501. <@").append(nextPlayer.getId()).append("> to throw first.\nGame on.").queue();
     }
 
     public TextChannel getChannel(){
         return this.channel;
     }
 
+    public void score(int points, User u){
+        User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+         if (u != nextPlayer){
+             channel.sendMessage("It's <@").append(nextPlayer.getId()).append(">'s turn to throw. Please wait.").queue();
+         } else {
+             // todo determine average
+             // substract the points from the remaining score and send message
+             // check if overthrown or game shot
+             int remaining = scores.get(nextPlayer);
+             if (points == remaining){
+                 channel.sendMessage("Finish the game by typing \"check\" and the number of darts needed, e.g. \"check 2.\n " +
+                         "You can also type \"c1\", \"c2\" or \"c3\" to save time.").queue();
+             } else if (points > remaining){
+                 channel.sendMessage("Busted! Remaining: ").append(String.valueOf(remaining)).queue();
+                 determineNext();
+             } else {
+                 //todo check if score is valid
+                 scores.put(nextPlayer, scores.get(nextPlayer) - points);
+                 channel.sendMessage("Remaining: ").append(scores.get(nextPlayer).toString()).queue();
+                 determineNext();
+             }
+         }
+    }
+
+    //count from player 0 to last player, then start again
+    private void determineNext(){
+        if (++intNextPlayer >= scores.keySet().toArray().length){
+            intNextPlayer = 0;
+        }
+    }
+
+    private boolean scoreIsValid(int points, int remaining){
+        return true;
+    }
 }
 
-//player score avg highscore doubles

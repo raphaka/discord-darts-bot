@@ -33,4 +33,8 @@ public final class GameManager {
     public void addGameX01(TextChannel t, GameX01 g){
         games.put(t,g);
     }
+
+    public GameX01 getGameByChannel(TextChannel t){
+        return games.getOrDefault(t, null);
+    }
 }

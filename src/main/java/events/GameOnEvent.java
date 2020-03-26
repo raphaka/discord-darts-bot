@@ -29,7 +29,6 @@ public class GameOnEvent extends ListenerAdapter {
                 GameManager.getInstance().addGameX01(g.getChannel(),g);
 
                 //Send message about players and channel of this game
-                //todo mention players names with @
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append("Playing a game of 501 double out\n<@").append(event.getMessage().getAuthor().getId());
                 for(User u : mentioned){
