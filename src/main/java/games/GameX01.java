@@ -61,9 +61,6 @@ public class GameX01 {
              channel.sendMessage("It's <@").append(nextPlayer.getId()).append(">'s turn to throw. Please wait.").queue();
          } else {
              // todo determine average
-             //todo overthrown if 1
-             // substract the points from the remaining score and send message
-             // check if overthrown or game shot
              int remaining = scores.get(nextPlayer);
              // Check if points is valid and substract from current score if not checkout or overthrown.
              if( points>180 || Arrays.stream(new int[]{163,166,169,172,173,175,176,178,179}).anyMatch(impossible-> impossible == points) ){
@@ -79,7 +76,6 @@ public class GameX01 {
                      channel.sendMessage("Next player: <@").append(nextPlayer.getId()).append(">").queue();
                  } else {
                      scores.put(nextPlayer, scores.get(nextPlayer) - points);
-                     //todo anounce next
                      channel.sendMessage("Remaining: ").append(scores.get(nextPlayer).toString()).queue();
                      determineNext();
                      nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];

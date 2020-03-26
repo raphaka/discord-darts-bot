@@ -25,20 +25,23 @@ public class GameOnEvent extends ListenerAdapter {
                 List<User> players = new ArrayList<User>();
                 players.add(event.getMessage().getAuthor());
                 players.addAll(mentioned);
-                GameX01 g = new GameX01(event.getChannel(), players);
-                GameManager.getInstance().addGameX01(g.getChannel(),g);
-                //todo check if already game running in the channel
-                //Send message about players and channel of this game
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("Playing a game of 501 double out\n<@").append(event.getMessage().getAuthor().getId());
-                for(User u : mentioned){
-                    stringBuilder.append("> vs <@").append(u.getId()).append(">");
+                if (GameManager.getInstance().getGameByChannel(event.getChannel())==null) {
+                    GameX01 g = new GameX01(event.getChannel(), players);
+                    GameManager.getInstance().addGameX01(g.getChannel(), g);
+                    //Send message about players and channel of this game
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.append("Playing a game of 501 double out\n<@").append(event.getMessage().getAuthor().getId());
+                    for (User u : mentioned) {
+                        stringBuilder.append("> vs <@").append(u.getId()).append(">");
+                    }
+                    stringBuilder.append("\n").append("<#").append(g.getChannel().getId()).append(">");
+                    event.getChannel().sendMessage(stringBuilder.toString()).queue();
+                } else {
+                    event.getChannel().sendMessage("A game is currently running in this channel. Please wait for the current game to finish.").queue();
                 }
-                stringBuilder.append("\n").append("<#").append(g.getChannel().getId()).append(">");
-                event.getChannel().sendMessage(stringBuilder.toString()).queue();
             } else {
                 event.getChannel().sendMessage("You have to choose at least one opponent. Challenge the other user with !gameon @<username>").queue();
-            }
+            }  
         }
     }
 }
