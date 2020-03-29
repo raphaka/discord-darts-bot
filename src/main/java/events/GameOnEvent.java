@@ -11,7 +11,8 @@ import java.util.List;
 
 /*
  * If the player types !gameon a new game will start against the mentioned opponents
- *
+ * If it is started in a channel in the category "dartboards" the match will start in this channel
+ * If it is started from another text channel, it will create a new one in the category dartboards
  */
 public class GameOnEvent extends ListenerAdapter {
 
@@ -19,12 +20,17 @@ public class GameOnEvent extends ListenerAdapter {
         // parse !gameon message
         String[] messageSent = event.getMessage().getContentRaw().split(" ");
         if (messageSent[0].equalsIgnoreCase("!gameon") || messageSent[0].equalsIgnoreCase("!go")){
+            // create a list of the participating players
+            // players are author and mentioned of the events message
             List<User> mentioned = event.getMessage().getMentionedUsers();
             int numPlayers = mentioned.size();
             if (numPlayers > 0) {
                 List<User> players = new ArrayList<User>();
                 players.add(event.getMessage().getAuthor());
                 players.addAll(mentioned);
+                // check if a game is currently active in the channel
+                // if not, create a new game for this channel
+                // the constructor of GameX01 will check the channel's category
                 if (GameManager.getInstance().getGameByChannel(event.getChannel())==null) {
                     GameX01 g = new GameX01(event.getChannel(), players);
                     GameManager.getInstance().addGameX01(g.getChannel(), g);
@@ -45,8 +51,3 @@ public class GameOnEvent extends ListenerAdapter {
         }
     }
 }
-
-// score event
-// get channel
-// get correct GameX01 for the channel
-// send getMessage() to this gameX01obj.score

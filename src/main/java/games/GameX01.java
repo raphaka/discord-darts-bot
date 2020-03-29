@@ -20,7 +20,7 @@ public class GameX01 {
     private int intNextPlayer;
     /*
      * Constructor sets the channel to be used.
-     * The category of the channel is Dartboard (will be created if not existing.
+     * The category of the channel is Dartboard (will be created if not existing)
      * A new channel in this category will be created or an old one will be used
      */
     public GameX01(TextChannel t, List<User> players){
@@ -45,6 +45,8 @@ public class GameX01 {
             this.scores.put(player, 501);
         }
         //todo mechanism for choosing who begins
+        //beginning player will be chosen randomly
+        //todo other player starts on rematch
         Random R = new Random();
         intNextPlayer = R.nextInt(scores.keySet().toArray().length);
         User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
@@ -55,7 +57,13 @@ public class GameX01 {
         return this.channel;
     }
 
+    /*
+     * Substracts the scored points from the remaining
+     * prompts user to use check command if remaining would be set to 0
+     * validates score to avoid impossible values
+     */
     public void score(int points, User u){
+         // determine who throws next
          User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
          if (u != nextPlayer){
              channel.sendMessage("It's <@").append(nextPlayer.getId()).append(">'s turn to throw. Please wait.").queue();
@@ -85,6 +93,9 @@ public class GameX01 {
          }
     }
 
+    /*
+     * Basically the same as the scoring function
+     */
     public void remaining(int rem, User u){
         User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
         if (u != nextPlayer){
@@ -129,6 +140,8 @@ public class GameX01 {
                 channel.sendMessage("Your score of ").append(String.valueOf(rem)).append(" cannot be finished with ")
                         .append(String.valueOf(darts)).append(" darts.").queue();
             }
+            // prompt user to quit or rematch
+            // rematch sets score back to startscore and legcounter ++ for winner
         }
     }
 
@@ -137,10 +150,6 @@ public class GameX01 {
         if (++intNextPlayer >= scores.keySet().toArray().length){
             intNextPlayer = 0;
         }
-    }
-
-    private boolean scoreIsValid(int points, int remaining){
-        return true;
     }
 }
 

@@ -12,17 +12,22 @@ public class RemainingEvent extends ListenerAdapter {
             int rem;
             try{
                 rem = Integer.parseInt(msg[1]);
-                GameX01 game = GameManager.getInstance().getGameByChannel(event.getChannel());
-                if (game != null) {
-                    game.remaining(rem, event.getMessage().getAuthor());
-                } else {
-                    // Game not in hashmap, bot restarted? todo add persistence for games
-                    if (event.getGuild().getCategoriesByName("Dartboards",true).contains(event.getChannel().getParent())) {
-                        event.getChannel().sendMessage("The match cannot be continued due to an error. Has the Darts-Bot been restarted lately?").queue();
-                    }
-                }
             } catch (java.lang.NumberFormatException e) {
+                return;
                 // if message cannot be parsed as an Integer, it is not meant to be processed by this handler
+            }
+            // check if a game is currently running
+            GameX01 game = GameManager.getInstance().getGameByChannel(event.getChannel());
+            if (game != null) {
+                game.remaining(rem, event.getMessage().getAuthor());
+            } else {
+                // Game not in hashmap, bot restarted? todo add persistence for games
+                if (event.getGuild().getCategoriesByName("Dartboards",true).contains(event.getChannel().getParent())) {
+                    System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                    event.getChannel().sendMessage("The match cannot be continued due to an error. Has the Darts-Bot been restarted lately?").queue();
+                    System.out.println(event.getMessage().getContentRaw());
+                    System.out.println("test22222");
+                }
             }
         }
     }
