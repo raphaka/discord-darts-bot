@@ -7,10 +7,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 
 public class GameX01 {
@@ -55,6 +52,10 @@ public class GameX01 {
 
     public TextChannel getChannel(){
         return this.channel;
+    }
+
+    public Set<User> getPlayers(){
+        return scores.keySet();
     }
 
     /*
