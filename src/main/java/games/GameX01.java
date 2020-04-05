@@ -1,11 +1,8 @@
 package games;
 
 import net.dv8tion.jda.api.entities.Category;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 
 import java.util.*;
 
@@ -14,18 +11,23 @@ public class GameX01 {
 
     private TextChannel channel;
     private HashMap<User, Integer> scores = new  HashMap<User, Integer>();
+    private HashMap<User, Integer> legs = new HashMap<User, Integer>();
     private int intNextPlayer;
+    private int intNextPlayerLegs;
+    private int num_of_legs = 1;
+
     /*
      * Constructor sets the channel to be used.
      * The category of the channel is Dartboard (will be created if not existing)
      * A new channel in this category will be created or an old one will be used
      */
-    public GameX01(TextChannel t, List<User> players){
+    public GameX01(TextChannel t, List<User> players, int n_o_legs){
         // add category Dartboards if not existing
         if (t.getGuild().getCategoriesByName("Dartboards",true).isEmpty()){
             t.getGuild().createCategory("Dartboards").complete();
         }
         Category catDartboards = t.getGuild().getCategoriesByName("Dartboards",true).get(0);
+        this.num_of_legs = n_o_legs;
         // start game in this channel or create a new one
         if (t.getParent() == catDartboards){
             this.channel = t;
@@ -40,6 +42,7 @@ public class GameX01 {
         // set startscore for all players
         for (User player : players) {
             this.scores.put(player, 501);
+            this.legs.put(player, 0);
         }
         //todo mechanism for choosing who begins
         //beginning player will be chosen randomly
@@ -48,6 +51,7 @@ public class GameX01 {
         intNextPlayer = R.nextInt(scores.keySet().toArray().length);
         User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
         channel.sendMessage("Starting a new game of 501. <@").append(nextPlayer.getId()).append("> to throw first.\nGame on.").queue();
+        intNextPlayerLegs = intNextPlayer;
     }
 
     public TextChannel getChannel(){
@@ -80,13 +84,13 @@ public class GameX01 {
                              "You can also type \"c1\", \"c2\" or \"c3\" to save time.").queue();
                  } else if (points > remaining || points == remaining-1) {
                      channel.sendMessage("Busted! Remaining: ").append(String.valueOf(remaining)).queue();
-                     determineNext();
+                     determineNextPlayer();
                      nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
                      channel.sendMessage("Next player: <@").append(nextPlayer.getId()).append(">").queue();
                  } else {
                      scores.put(nextPlayer, scores.get(nextPlayer) - points);
                      channel.sendMessage("Remaining: ").append(scores.get(nextPlayer).toString()).queue();
-                     determineNext();
+                     determineNextPlayer();
                      nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
                      channel.sendMessage("Next player: <@").append(nextPlayer.getId()).append(">").queue();
                  }
@@ -107,7 +111,7 @@ public class GameX01 {
                 channel.sendMessage("Your score of ").append(String.valueOf(points)).append(" cannot be achieved with three darts. Please correct your input.").queue();
             } else if (rem == 1 || rem <0){
                 channel.sendMessage("Busted! Remaining: ").append(String.valueOf(rem)).queue();
-                determineNext();
+                determineNextPlayer();
                 nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
                 channel.sendMessage("Next player: <@").append(nextPlayer.getId()).append(">").queue();
             } else if(rem == 0){
@@ -116,7 +120,7 @@ public class GameX01 {
             } else {
                 scores.put(nextPlayer, rem);
                 channel.sendMessage("Remaining: ").append(String.valueOf(rem)).queue();
-                determineNext();
+                determineNextPlayer();
                 nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
                 channel.sendMessage("Next player: <@").append(nextPlayer.getId()).append(">").queue();
             }
@@ -133,11 +137,14 @@ public class GameX01 {
             int rem = scores.get(nextPlayer);
             if (darts == 1 && rem<41 && rem%2==0){
                 channel.sendMessage("GAME SHOT by <@").append(nextPlayer.getId()).append("> with the first dart").queue();
+                playerWonLeg(nextPlayer);
             } else if (darts == 2 && (rem<99 || Arrays.stream(new int[]{100,101,104,107,110}).anyMatch(notbogey-> notbogey == rem))){
                 channel.sendMessage("GAME SHOT by <@").append(nextPlayer.getId()).append("> with the second dart").queue();
+                playerWonLeg(nextPlayer);
             } else if (darts == 3 && (rem<159 || Arrays.stream(new int[]{170,167,164,161,160}).anyMatch(notbogey-> notbogey == rem))){
                 channel.sendMessage("GAME SHOT by <@").append(nextPlayer.getId()).append("> with the third dart").queue();
-            } else{
+                playerWonLeg(nextPlayer);
+            } else {
                 channel.sendMessage("Your score of ").append(String.valueOf(rem)).append(" cannot be finished with ")
                         .append(String.valueOf(darts)).append(" darts.").queue();
             }
@@ -146,11 +153,37 @@ public class GameX01 {
         }
     }
 
+    private void playerWonLeg(User winner){
+        legs.put(winner, legs.get(winner) + 1);
+        channel.sendMessage("Won Legs: " + legs.get(winner)).queue();
+//        if (this.num_of_legs%2!=0){
+//            if (legs.get(winner) <= this.num_of_legs/2 + 0.5){
+//                //todo determine if player won match
+//            }
+//        }
+        //todo prompt and remove game if bestof is won
+        for (User player : this.scores.keySet()) {
+            this.scores.put(player, 501);
+        }
+        intNextPlayer = determineNextPlayerLegs();
+        User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+        channel.sendMessage("<@").append(nextPlayer.getId()).append("> to throw first").queue();
+    }
+
     //count from player 0 to last player, then start again
-    private void determineNext(){
-        if (++intNextPlayer >= scores.keySet().toArray().length){
+    private void determineNextPlayer(){
+        if (++intNextPlayer >= this.scores.keySet().toArray().length){
             intNextPlayer = 0;
         }
     }
+
+    //count from player 0 to last player for legs, then start again
+    private int determineNextPlayerLegs(){
+        if (++intNextPlayerLegs >= this.scores.keySet().toArray().length){
+            intNextPlayerLegs = 0;
+        }
+        return intNextPlayerLegs;
+    }
+
 }
 

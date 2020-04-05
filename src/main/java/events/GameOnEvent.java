@@ -9,6 +9,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+
+//todo create bestof listener
+
 /*
  * If the player types !gameon a new game will start against the mentioned opponents
  * If it is started in a channel in the category "dartboards" the match will start in this channel
@@ -32,7 +35,7 @@ public class GameOnEvent extends ListenerAdapter {
                 // if not, create a new game for this channel
                 // the constructor of GameX01 will check the channel's category
                 if (GameManager.getInstance().getGameByChannel(event.getChannel())==null) {
-                    GameX01 g = new GameX01(event.getChannel(), players);
+                    GameX01 g = new GameX01(event.getChannel(), players, 1);
                     GameManager.getInstance().addGameX01(g.getChannel(), g);
                     //Send message about players and channel of this game
                     StringBuilder stringBuilder = new StringBuilder();
