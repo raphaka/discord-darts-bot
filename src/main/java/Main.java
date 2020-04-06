@@ -13,6 +13,7 @@ public class Main {
     public static void main(String[] args) throws javax.security.auth.login.LoginException{
         jda = new JDABuilder(args[0]).build();
         jda.addEventListener(new GameOnEvent());
+        jda.addEventListener(new MatchEvent());
         jda.addEventListener(new ScoreEvent());
         jda.addEventListener(new CheckEvent());
         jda.addEventListener(new QuitEvent());

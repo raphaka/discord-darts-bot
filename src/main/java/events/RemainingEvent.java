@@ -1,7 +1,8 @@
 package events;
 
-import Managers.GameManager;
+import Managers.MatchManager;
 import games.GameX01;
+import games.Match;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -16,17 +17,20 @@ public class RemainingEvent extends ListenerAdapter {
                 return;
                 // if message cannot be parsed as an Integer, it is not meant to be processed by this handler
             }
-            // check if a game is currently running
-            GameX01 game = GameManager.getInstance().getGameByChannel(event.getChannel());
-            if (game != null) {
-                game.remaining(rem, event.getMessage().getAuthor());
+            // check if a match/game is currently running
+            Match m = MatchManager.getInstance().getMatchByChannel(event.getChannel());
+            if (m != null) {
+                GameX01 game = m.getCurrentGame();
+                if (game != null) {
+                    game.remaining(rem, event.getMessage().getAuthor());
+                } else {
+                    event.getChannel().sendMessage("The game cannot be continued due to an error. Has the Darts-Bot been restarted lately?").queue();
+                    System.err.println("No game found in match " + m);
+                }
             } else {
-                // Game not in hashmap, bot restarted? todo add persistence for games
-                if (event.getGuild().getCategoriesByName("Dartboards",true).contains(event.getChannel().getParent())) {
-                    System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                // Match not in hashmap, bot restarted? todo add persistence for games
+                if (event.getGuild().getCategoriesByName("Dartboards", true).contains(event.getChannel().getParent())) {
                     event.getChannel().sendMessage("The match cannot be continued due to an error. Has the Darts-Bot been restarted lately?").queue();
-                    System.out.println(event.getMessage().getContentRaw());
-                    System.out.println("test22222");
                 }
             }
         }
