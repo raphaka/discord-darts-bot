@@ -37,17 +37,8 @@ public class GameOnEvent extends ListenerAdapter {
 
         // Start new match
         if (MatchManager.getInstance().getMatchByChannel(event.getChannel())==null) {
-            // todo prompt in Match-/Game objects sent before this prompt
             Match m = new Match(event.getChannel(), players, 1);
             MatchManager.getInstance().addMatch(m.getChannel(), m);
-            //Send message about players and channel of this game
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("New match started: \n<@").append(event.getMessage().getAuthor().getId());
-            for (User u : mentioned) {
-                stringBuilder.append("> vs <@").append(u.getId()).append(">");
-            }
-            stringBuilder.append("\n").append("<#").append(m.getChannel().getId()).append(">");
-            event.getChannel().sendMessage(stringBuilder.toString()).queue();
         } else {
             event.getChannel().sendMessage("A match is currently running in this channel. Please wait for the current game to finish.").queue();
         }

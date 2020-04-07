@@ -22,13 +22,15 @@ public class Match {
 
     public Match(TextChannel t, List<User> p, int n_o_legs) {
         this.players = p;
-        this.channel = t;
         useCreateDartboard(t);
         this.num_of_legs = n_o_legs;
+        MessageAction msg = t.sendMessage("A new match started.\nChannel: <#").append(channel.getId()).append(">\nPlayers: ");
         for (User player : players) {
             this.legs.put(player, 0);
+            msg.append("<@").append(player.getId()).append("> ");
         }
-       curGame = new GameX01(channel, players);
+        msg.append("\nNumber of Legs: ").append(String.valueOf(n_o_legs)).queue();
+        curGame = new GameX01(channel, players);
     }
 
     //updates legs count for player, determines if/how game is finished + quits match or starts new leg

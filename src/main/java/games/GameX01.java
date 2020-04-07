@@ -30,7 +30,7 @@ public class GameX01 {
         Random R = new Random();
         intNextPlayer = R.nextInt(scores.keySet().toArray().length);
         User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
-        channel.sendMessage("Starting a new game of 501.\n<@").append(nextPlayer.getId()).append("> to throw first.\nGame on.").queue();
+        channel.sendMessage(nextPlayer.getName()).append(" to throw first.\nGame on.").queue();
     }
 
     /*
