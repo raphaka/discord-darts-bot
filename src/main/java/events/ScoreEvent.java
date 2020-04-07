@@ -26,7 +26,7 @@ public class ScoreEvent extends ListenerAdapter{
                 System.err.println("No game found in match " + m);
             }
         } else {
-            // Match not in hashmap, bot restarted? todo add persistence for games
+            // Match not in hashmap, bot restarted?
             if (event.getGuild().getCategoriesByName("Dartboards", true).contains(event.getChannel().getParent())) {
                 event.getChannel().sendMessage("The match cannot be continued due to an error. Has the Darts-Bot been restarted lately?").queue();
             }

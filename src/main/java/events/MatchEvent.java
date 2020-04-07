@@ -14,8 +14,11 @@ public class MatchEvent extends ListenerAdapter {
 
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         String[] messageSent = event.getMessage().getContentRaw().split(" ");
-        // ignore message if it doesn't start with !bestof
-        if (!messageSent[0].equalsIgnoreCase("!bestof")) {
+        // ignore message if it doesn't start with !bestof or similar
+        if (!(messageSent[0].equalsIgnoreCase("!bestof")
+                || messageSent[0].equalsIgnoreCase("!bo")
+                ||messageSent[0].equalsIgnoreCase("!match")
+                ||messageSent[0].equalsIgnoreCase("!m"))) {
             return;
         }
         // prompt if too few arguments or second arg is not Integer
@@ -43,8 +46,9 @@ public class MatchEvent extends ListenerAdapter {
             return;
         }
 
+        // Start new match
         if (MatchManager.getInstance().getMatchByChannel(event.getChannel())==null) {
-            // todo prompt in Match-/Game objects printed sent before this prompt
+            // todo prompt in Match-/Game objects sent before this prompt
             Match m = new Match(event.getChannel(), players, legs);
             MatchManager.getInstance().addMatch(m.getChannel(), m);
             //Send message about players and channel of this game

@@ -3,6 +3,7 @@ package games;
 import Managers.MatchManager;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 import java.util.*;
 
@@ -19,7 +20,6 @@ public class GameX01 {
      * A new channel in this category will be created or an old one will be used
      */
     public GameX01(TextChannel t, List<User> players){ //todo param starter
-        System.out.println("game started");
         this.channel = t;
         // set startscore for all players
         for (User player : players) {
@@ -30,11 +30,8 @@ public class GameX01 {
         Random R = new Random();
         intNextPlayer = R.nextInt(scores.keySet().toArray().length);
         User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
-        channel.sendMessage("Starting a new game of 501. <@").append(nextPlayer.getId()).append("> to throw first.\nGame on.").queue();
+        channel.sendMessage("Starting a new game of 501.\n<@").append(nextPlayer.getId()).append("> to throw first.\nGame on.").queue();
     }
-
-
-
 
     /*
      * Substracts the scored points from the remaining
@@ -47,7 +44,6 @@ public class GameX01 {
          if (u != nextPlayer){
              channel.sendMessage("It's <@").append(nextPlayer.getId()).append(">'s turn to throw. Please wait.").queue();
          } else {
-             // todo determine average
              int remaining = scores.get(nextPlayer);
              // Check if points is valid and substract from current score if not checkout or overthrown.
              if( points>180 || Arrays.stream(new int[]{163,166,169,172,173,175,176,178,179}).anyMatch(impossible-> impossible == points) ){
@@ -57,13 +53,13 @@ public class GameX01 {
                      channel.sendMessage("Finish the game by typing \"check\" and the number of darts needed, e.g. \"check 2.\n " +
                              "You can also type \"c1\", \"c2\" or \"c3\" to save time.").queue();
                  } else if (points > remaining || points == remaining-1) {
-                     channel.sendMessage("Busted! Remaining: ").append(String.valueOf(remaining)).queue();
+                     MessageAction msg = channel.sendMessage("Busted! Remaining: ").append(String.valueOf(remaining));
                      determineNextPlayer();
                      nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
-                     channel.sendMessage("Next player: <@").append(nextPlayer.getId()).append(">").queue();
+                     msg.append("Next player: <@").append(nextPlayer.getId()).append(">").queue();
                  } else {
                      scores.put(nextPlayer, scores.get(nextPlayer) - points);
-                     channel.sendMessage("Remaining: ").append(scores.get(nextPlayer).toString()).queue();
+                     MessageAction msg = channel.sendMessage("Remaining: ").append(scores.get(nextPlayer).toString());
                      determineNextPlayer();
                      nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
                      channel.sendMessage("Next player: <@").append(nextPlayer.getId()).append(">").queue();
@@ -84,19 +80,19 @@ public class GameX01 {
             if (points < 0 || points>180 || Arrays.stream(new int[]{163,166,169,172,173,175,176,178,179}).anyMatch(impossible-> impossible == points)){
                 channel.sendMessage("Your score of ").append(String.valueOf(points)).append(" cannot be achieved with three darts. Please correct your input.").queue();
             } else if (rem == 1 || rem <0){
-                channel.sendMessage("Busted! Remaining: ").append(String.valueOf(rem)).queue();
+                MessageAction msg = channel.sendMessage("Busted! Remaining: ").append(String.valueOf(rem));
                 determineNextPlayer();
                 nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
-                channel.sendMessage("Next player: <@").append(nextPlayer.getId()).append(">").queue();
+                msg.append("\nNext player: <@").append(nextPlayer.getId()).append(">").queue();
             } else if(rem == 0){
                 channel.sendMessage("Finish the game by typing \"check\" and the number of darts needed, e.g. \"check 2.\n " +
                         "You can also type \"c1\", \"c2\" or \"c3\" to save time.").queue();
             } else {
                 scores.put(nextPlayer, rem);
-                channel.sendMessage("Remaining: ").append(String.valueOf(rem)).queue();
+                MessageAction msg = channel.sendMessage("Remaining: ").append(String.valueOf(rem));
                 determineNextPlayer();
                 nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
-                channel.sendMessage("Next player: <@").append(nextPlayer.getId()).append(">").queue();
+                msg.append("\nNext player: <@").append(nextPlayer.getId()).append(">").queue();
             }
         }
     }

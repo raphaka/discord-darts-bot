@@ -1,8 +1,10 @@
 package games;
 
+import Managers.MatchManager;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,12 +16,12 @@ public class Match {
     private GameX01 curGame;
     private List<User> players;
     private int intNextPlayer;
-    private int num_of_legs = 1;
+    private float num_of_legs = 1; //float because it is divided by 2 or num of players in playerWonLeg()
+    private int finished_legs = 0;
     private HashMap<User, Integer> legs = new HashMap<User, Integer>();
 
     public Match(TextChannel t, List<User> p, int n_o_legs) {
         this.players = p;
-        System.out.println("match started with " + n_o_legs + "legs");
         this.channel = t;
         useCreateDartboard(t);
         this.num_of_legs = n_o_legs;
@@ -29,20 +31,40 @@ public class Match {
        curGame = new GameX01(channel, players);
     }
 
+    //updates legs count for player, determines if/how game is finished + quits match or starts new leg
     public void playerWonLeg(User winner){
+        finished_legs ++;
         legs.put(winner, legs.get(winner) + 1);
-        channel.sendMessage("Won Legs: " + legs.get(winner)).queue();
-//        if (this.num_of_legs%2!=0){
-//            if (legs.get(winner) <= this.num_of_legs/2 + 0.5){
-//                //todo determine if player won match
-//            }
-//        }
-        //todo prompt and remove game if bestof is won
-        //determineNextPlayer();
-        //User nextPlayer = (User)legs.keySet().toArray()[intNextPlayer];
-        //channel.sendMessage("<@").append(nextPlayer.getId()).append("> to throw first").queue();
+        MessageAction msg = channel.sendMessage("Won Legs: \n");
+        boolean draw = true; // assume draw until any player in loop has different score than required for draw
+        for (User player : players) {
+            msg.append(player.getName()).append(":   ").append(String.valueOf(legs.get(player))).append("\n");
+            if (legs.get(player) != num_of_legs/players.size()){
+                draw = false;
+            }
+        }
+        msg.queue();
+
+        if (legs.get(winner) > num_of_legs/2.0){
+            channel.sendMessage(winner.getName()).append(" has won the match.").queue();
+            MatchManager.getInstance().removeMatchByChannel(channel);
+            return;
+        }
+
+        if (draw){
+            channel.sendMessage("It's a draw.").queue();
+            MatchManager.getInstance().removeMatchByChannel(channel);
+            return;
+        }
+
+        if (finished_legs == num_of_legs){
+            channel.sendMessage("Game has finished.").queue();
+            MatchManager.getInstance().removeMatchByChannel(channel);
+            return;
+        }
+
         determineNextPlayer();
-        //todo new game with starter as param
+        //starter as param
         curGame = new GameX01(channel, this.players);
     }
 
