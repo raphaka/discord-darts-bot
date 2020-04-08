@@ -16,8 +16,9 @@ The jar file will be located in the _target_ folder.
 Run the application with `java -jar <path to your jar file> <your bot token>`
 
 ## List of commands
-- !gameon @opponent - play a game of 501 Double out against @opponent
+- !gameon @opponent - play a single game of 501 Double out against @opponent (alias: !go)
+- !bestof <legs> @opponent - play a match with multiple legs against @opponent (aliases: !bo, !match, !m)
 - XY - you scored XY points
-- remaining XY - your remaining score is XY points (alternatives: rXY, rest XY)
-- check Y - you checked out with Y darts.
-- !quit - abandon the current game
+- remaining XY - your remaining score is XY points (aliases: r XY, rest XY)
+- check Y - you checked out with Y darts (aliases: c Y)
+- !quit - abandon the current match

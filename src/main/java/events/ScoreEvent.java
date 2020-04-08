@@ -1,7 +1,8 @@
 package events;
 
-import Managers.GameManager;
+import Managers.MatchManager;
 import games.GameX01;
+import games.Match;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -15,14 +16,22 @@ public class ScoreEvent extends ListenerAdapter{
             return;
             // if message cannot be parsed as an Integer, it is not meant to be processed by this handler
         }
-        // check if a game is currently running
-        GameX01 game = GameManager.getInstance().getGameByChannel(event.getChannel());
-        if (game != null) {
-            game.score(points, event.getMessage().getAuthor());
-        } else {
-            // Game not in hashmap, bot restarted? todo add persistence for games
-            if (event.getGuild().getCategoriesByName("Dartboards",true).contains(event.getChannel().getParent())) {
-                event.getChannel().sendMessage("The match cannot be continued due to an error. Has the Darts-Bot been restarted lately?").queue();
+        if (event.getGuild().getCategoriesByName("Dartboards", true).contains(event.getChannel().getParent())) {
+            // check if a match/game is currently running
+            Match m = MatchManager.getInstance().getMatchByChannel(event.getChannel());
+            if (m != null) {
+                GameX01 game = m.getCurrentGame();
+                if (m.isWaitingForStart()){
+                    m.startMatch(points,event.getAuthor());
+                } else if (game != null) {
+                    game.score(points, event.getAuthor());
+                } else {
+                    event.getChannel().sendMessage("The game cannot be continued due to an error. Has the Darts-Bot been restarted lately?").queue();
+                    System.err.println("No game found in match " + m);
+                }
+            } else {
+                // Match not in hashmap, bot restarted?
+                event.getChannel().sendMessage("There's no match currently running in this channel. Has the Darts-Bot been restarted lately?").queue();
             }
         }
     }

@@ -9,18 +9,29 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * If the player types !gameon a new game will start against the mentioned opponents
- * If it is started in a channel in the category "dartboards" the match will start in this channel
- * If it is started from another text channel, it will create a new one in the category dartboards
- */
-public class GameOnEvent extends ListenerAdapter {
+public class MatchEvent extends ListenerAdapter {
 
-    public void onGuildMessageReceived(GuildMessageReceivedEvent event){
-        // parse !gameon message
+    public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         String[] messageSent = event.getMessage().getContentRaw().split(" ");
-        if (!(messageSent[0].equalsIgnoreCase("!gameon") || messageSent[0].equalsIgnoreCase("!go"))) {
+        // ignore message if it doesn't start with !bestof or similar
+        if (!(messageSent[0].equalsIgnoreCase("!bestof")
+                || messageSent[0].equalsIgnoreCase("!bo")
+                ||messageSent[0].equalsIgnoreCase("!match")
+                ||messageSent[0].equalsIgnoreCase("!m"))) {
             return;
+        }
+        // prompt if too few arguments or second arg is not Integer
+        if (messageSent.length < 2){
+            event.getChannel(). sendMessage("Please set the number of legs with !bestof <legs> @<opponent>").queue();
+            return;
+        }
+        int legs;
+        try{
+            legs = Integer.parseInt(messageSent[1]);
+        } catch (NumberFormatException e) {
+            event.getChannel(). sendMessage("Please set the number of legs with !bestof <legs> @<opponent>").queue();
+            return;
+            // if message cannot be parsed as an Integer, it is not meant to be processed by this handler
         }
         // prompt if no opponent is chosen
         List<User> mentioned = event.getMessage().getMentionedUsers();
@@ -36,8 +47,7 @@ public class GameOnEvent extends ListenerAdapter {
 
         // Start new match
         if (MatchManager.getInstance().getMatchByChannel(event.getChannel())==null) {
-            Match m = new Match(event.getChannel(), players, 1);
-            MatchManager.getInstance().addMatch(m.getChannel(), m);
+            Match m = new Match(event.getChannel(), players, legs);
         } else {
             event.getChannel().sendMessage("A match is currently running in this channel. Please wait for the current game to finish.").queue();
         }
