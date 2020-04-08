@@ -1,7 +1,6 @@
 package events;
 
 import Managers.MatchManager;
-import games.GameX01;
 import games.Match;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 public class Match {
@@ -16,6 +17,7 @@ public class Match {
     private GameX01 curGame;
     private List<User> players;
     private int intNextPlayer;
+    private boolean waitingForStart = true;
     private float num_of_legs = 1; //float because it is divided by 2 or num of players in playerWonLeg()
     private int finished_legs = 0;
     private HashMap<User, Integer> legs = new HashMap<User, Integer>();
@@ -30,7 +32,7 @@ public class Match {
             msg.append("<@").append(player.getId()).append("> ");
         }
         msg.append("\nNumber of Legs: ").append(String.valueOf(n_o_legs)).queue();
-        curGame = new GameX01(channel, players);
+        channel.sendMessage("A new game is about to start. Type your score as the first player or type '!random'").queue();
     }
 
     //updates legs count for player, determines if/how game is finished + quits match or starts new leg
@@ -67,7 +69,25 @@ public class Match {
 
         determineNextPlayer();
         //starter as param
-        curGame = new GameX01(channel, this.players);
+        curGame = new GameX01(channel, this.players, intNextPlayer);
+    }
+
+    //create new game and score for the first player
+    public void startMatch(int points, User u){
+        intNextPlayer = players.indexOf(u);
+        if (intNextPlayer != -1){
+            if (points == -1){
+                // random player begins
+                Random R = new Random();
+                intNextPlayer = R.nextInt(players.size());
+                curGame = new GameX01(channel, players, intNextPlayer);
+            } else {
+                curGame = new GameX01(channel, players, intNextPlayer);
+                channel.sendMessage(players.get(intNextPlayer).getName()).append(" scored ").append(String.valueOf(points)).append(" points").queue();
+                curGame.score(points,u);
+            }
+            waitingForStart = false;
+        }
     }
 
     //count from player 0 to last player, then start again
@@ -105,6 +125,9 @@ public class Match {
     }
     public Set<User> getPlayers(){
         return legs.keySet();
+    }
+    public boolean isWaitingForStart() {
+        return waitingForStart;
     }
 
 }

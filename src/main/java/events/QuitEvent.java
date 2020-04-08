@@ -1,7 +1,6 @@
 package events;
 
 import Managers.MatchManager;
-import games.GameX01;
 import games.Match;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -24,7 +23,7 @@ public class QuitEvent extends ListenerAdapter {
                     event.getGuild().getMembersWithRoles(event.getGuild().getRolesByName("Admin", true).get(0)).forEach(m -> {
                         if (event.getAuthor() == m.getUser()) {
                             MatchManager.getInstance().removeMatchByChannel(event.getChannel());
-                            event.getChannel().sendMessage("Game has been quit. A new game can be started with !gameon or !go followed by @-mentions of your opponents").queue();
+                            event.getChannel().sendMessage("Game has been quit.\nUse !gameon or !bestof to start a new game.").queue();
                         }
                     });
                 }

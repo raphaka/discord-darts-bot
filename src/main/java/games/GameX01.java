@@ -13,23 +13,22 @@ public class GameX01 {
     private TextChannel channel;
     private HashMap<User, Integer> scores = new  HashMap<User, Integer>();
     private int intNextPlayer;
+    private List<User> players;
 
     /*
      * Constructor sets the channel to be used.
      * The category of the channel is Dartboard (will be created if not existing)
      * A new channel in this category will be created or an old one will be used
      */
-    public GameX01(TextChannel t, List<User> players){ //todo param starter
+    public GameX01(TextChannel t, List<User> players, int starter){ //todo param starter
         this.channel = t;
+        this.players = players;
         // set startscore for all players
         for (User player : players) {
             this.scores.put(player, 501);
         }
-        //todo mechanism for choosing who begins
-        //beginning player will be chosen randomly
-        Random R = new Random();
-        intNextPlayer = R.nextInt(scores.keySet().toArray().length);
-        User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+        intNextPlayer = starter;
+        User nextPlayer = players.get(intNextPlayer);
         channel.sendMessage(nextPlayer.getName()).append(" to throw first.\nGame on.").queue();
     }
 
@@ -40,7 +39,7 @@ public class GameX01 {
      */
     public void score(int points, User u){
          // determine who throws next
-         User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+         User nextPlayer = players.get(intNextPlayer);
          if (u != nextPlayer){
              channel.sendMessage("It's <@").append(nextPlayer.getId()).append(">'s turn to throw. Please wait.").queue();
          } else {
@@ -55,14 +54,14 @@ public class GameX01 {
                  } else if (points > remaining || points == remaining-1) {
                      MessageAction msg = channel.sendMessage("Busted! Remaining: ").append(String.valueOf(remaining));
                      determineNextPlayer();
-                     nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+                     nextPlayer = players.get(intNextPlayer);
                      msg.append("Next player: <@").append(nextPlayer.getId()).append(">").queue();
                  } else {
                      scores.put(nextPlayer, scores.get(nextPlayer) - points);
                      MessageAction msg = channel.sendMessage("Remaining: ").append(scores.get(nextPlayer).toString());
                      determineNextPlayer();
-                     nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
-                     channel.sendMessage("Next player: <@").append(nextPlayer.getId()).append(">").queue();
+                     nextPlayer = players.get(intNextPlayer);
+                     msg.append("\nNext player: <@").append(nextPlayer.getId()).append(">").queue();
                  }
              }
          }
@@ -72,7 +71,7 @@ public class GameX01 {
      * Basically the same as the scoring function
      */
     public void remaining(int rem, User u){
-        User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+        User nextPlayer = players.get(intNextPlayer);
         if (u != nextPlayer){
             channel.sendMessage("It's <@").append(nextPlayer.getId()).append(">'s turn to throw. Please wait.").queue();
         } else {
@@ -82,7 +81,7 @@ public class GameX01 {
             } else if (rem == 1 || rem <0){
                 MessageAction msg = channel.sendMessage("Busted! Remaining: ").append(String.valueOf(rem));
                 determineNextPlayer();
-                nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+                nextPlayer = players.get(intNextPlayer);
                 msg.append("\nNext player: <@").append(nextPlayer.getId()).append(">").queue();
             } else if(rem == 0){
                 channel.sendMessage("Finish the game by typing \"check\" and the number of darts needed, e.g. \"check 2.\n " +
@@ -91,7 +90,7 @@ public class GameX01 {
                 scores.put(nextPlayer, rem);
                 MessageAction msg = channel.sendMessage("Remaining: ").append(String.valueOf(rem));
                 determineNextPlayer();
-                nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+                nextPlayer = players.get(intNextPlayer);
                 msg.append("\nNext player: <@").append(nextPlayer.getId()).append(">").queue();
             }
         }
@@ -100,7 +99,7 @@ public class GameX01 {
     // end game with checkout
     // validate if score is possible with the given amount of darts
     public void check(int darts, User u){
-        User nextPlayer = (User)scores.keySet().toArray()[intNextPlayer];
+        User nextPlayer = players.get(intNextPlayer);
         if (u != nextPlayer){
             channel.sendMessage("It's <@").append(nextPlayer.getId()).append(">'s turn to throw. Please wait.").queue();
         } else {
