@@ -48,7 +48,6 @@ public class MatchEvent extends ListenerAdapter {
         // Start new match
         if (MatchManager.getInstance().getMatchByChannel(event.getChannel())==null) {
             Match m = new Match(event.getChannel(), players, legs);
-            MatchManager.getInstance().addMatch(m.getChannel(), m);
         } else {
             event.getChannel().sendMessage("A match is currently running in this channel. Please wait for the current game to finish.").queue();
         }

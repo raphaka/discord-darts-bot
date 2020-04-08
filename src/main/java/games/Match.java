@@ -24,7 +24,12 @@ public class Match {
 
     public Match(TextChannel t, List<User> p, int n_o_legs) {
         this.players = p;
-        useCreateDartboard(t);
+        this.channel = useCreateDartboard(t);
+        if (this.channel == null){
+            t.sendMessage("Match could not be created. No channel found and server limit reached.");
+            return;
+        }
+        MatchManager.getInstance().addMatch(this.channel, this);
         this.num_of_legs = n_o_legs;
         MessageAction msg = t.sendMessage("A new match started.\nChannel: <#").append(channel.getId()).append(">\nPlayers: ");
         for (User player : players) {
@@ -98,7 +103,7 @@ public class Match {
     }
 
 
-    private void useCreateDartboard(TextChannel t){
+    private TextChannel useCreateDartboard(TextChannel t){
         // add category Dartboards if not existing
         if (t.getGuild().getCategoriesByName("Dartboards",true).isEmpty()){
             t.getGuild().createCategory("Dartboards").complete();
@@ -106,14 +111,28 @@ public class Match {
         Category catDartboards = t.getGuild().getCategoriesByName("Dartboards",true).get(0);
         // start game in this channel or create a new one
         if (t.getParent() == catDartboards){
-            this.channel = t;
+            return t;
         } else {
             // Create a new text channel in Category Dartboards or use an unused one
+            // loop through all numbers
             int dartboardNumber = 1;
-            while(!t.getGuild().getTextChannelsByName("dartboard-" + dartboardNumber,true).isEmpty()){
+            while (!t.getGuild().getTextChannelsByName("dartboard-" + dartboardNumber, true).isEmpty()) {
+                // loop through all boards with the number
+                for (TextChannel board : t.getGuild().getTextChannelsByName("dartboard-" + dartboardNumber, true)) {
+                    // use this channel if it is currently not used
+                    if (!MatchManager.getInstance().getUsedChannels().contains(board)) {
+                        return board;
+                    }
+                }
                 dartboardNumber++;
             }
-            this.channel = t.getGuild().createTextChannel("dartboard-" + dartboardNumber).setParent(catDartboards).complete();
+            //create a new channel if possible
+            if (channel.getGuild().getChannels().size() == 500) {
+                // discord server limit is reached
+                return null;
+            } else {
+                return t.getGuild().createTextChannel("dartboard-" + dartboardNumber).setParent(catDartboards).complete();
+            }
         }
     }
 

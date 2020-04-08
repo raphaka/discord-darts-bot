@@ -20,7 +20,7 @@ public class GameX01 {
      * The category of the channel is Dartboard (will be created if not existing)
      * A new channel in this category will be created or an old one will be used
      */
-    public GameX01(TextChannel t, List<User> players, int starter){ //todo param starter
+    public GameX01(TextChannel t, List<User> players, int starter){
         this.channel = t;
         this.players = players;
         // set startscore for all players

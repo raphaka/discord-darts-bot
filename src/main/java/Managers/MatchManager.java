@@ -4,6 +4,8 @@ import games.Match;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 /*
  *  Only one object is created from this class.
@@ -40,5 +42,9 @@ public final class MatchManager {
 
     public Match getMatchByChannel(TextChannel t){
         return games.getOrDefault(t, null);
+    }
+
+    public Set<TextChannel> getUsedChannels() {
+        return games.keySet();
     }
 }
