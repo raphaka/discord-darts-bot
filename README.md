@@ -20,5 +20,5 @@ Run the application with `java -jar <path to your jar file> <your bot token>`
 - !bestof <legs> @opponent - play a match with multiple legs against @opponent (aliases: !bo, !match, !m)
 - XY - you scored XY points
 - remaining XY - your remaining score is XY points (aliases: r XY, rest XY)
-- check Y - you checked out with Y darts (aliases: c Y)
+- check Y - you checked out with Y darts (alias: c Y)
 - !quit - abandon the current match
