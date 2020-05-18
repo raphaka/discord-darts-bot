@@ -14,6 +14,7 @@ public class GameX01 {
     private HashMap<User, Integer> scores = new  HashMap<User, Integer>();
     private int intNextPlayer;
     private List<User> players;
+    private int startScore;
 
     /*
      * Constructor sets the channel to be used.
@@ -23,9 +24,10 @@ public class GameX01 {
     public GameX01(TextChannel t, List<User> players, int starter){
         this.channel = t;
         this.players = players;
+        this.startScore = 501; //TODO option to customize
         // set startscore for all players
         for (User player : players) {
-            this.scores.put(player, 501);
+            this.scores.put(player, startScore);
         }
         intNextPlayer = starter;
         User nextPlayer = players.get(intNextPlayer);
@@ -130,5 +132,20 @@ public class GameX01 {
         }
     }
 
+    //corrects the players score.
+    //Corrected Score is not validated mathematically
+    public void correction(int cor, User u) {
+        if (cor > 1 && cor < startScore){
+            scores.put(u,cor);
+            MessageAction msg = channel.sendMessage("Score has been updated manually:\n");
+            for (User player : players) {
+                msg.append(player.getName()).append(":  ").append(String.valueOf(scores.get(player))).append("\n");
+            }
+            User nextPlayer = players.get(intNextPlayer);
+            msg.append("<@").append(nextPlayer.getId()).append("> to throw next.").queue();
+        } else {
+            channel.sendMessage("Score could not be updated manually.").queue();
+        }
+    }
 }
 

@@ -16,6 +16,7 @@ public class Main {
         jda.addEventListener(new QuitEvent());
         jda.addEventListener(new RemainingEvent());
         jda.addEventListener(new HelpEvent());
+        jda.addEventListener(new CorrectEvent());
     }
 
 }

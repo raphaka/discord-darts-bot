@@ -21,4 +21,5 @@ Run the application with `java -jar <path to your jar file> <your bot token>`
 - XY - you scored XY points
 - remaining XY - your remaining score is XY points (aliases: r XY, rest XY)
 - check Y - you checked out with Y darts (alias: c Y)
+- correct XY - manually input your remaining score at any time to correct it (aliases: cor, correction)
 - !quit - abandon the current match

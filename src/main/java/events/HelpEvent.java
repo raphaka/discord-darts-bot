@@ -15,6 +15,7 @@ public class HelpEvent extends ListenerAdapter {
                     "XY - you scored XY points\n" +
                     "remaining XY - your remaining score is XY points (aliases: r XY, rest XY)\n" +
                     "check Y - you checked out with Y darts (alias: c Y)\n" +
+                    "correct XY - manually input your remaining score at any time to correct it (aliases: cor, correction)\n" +
                     "!quit - abandon the current match").queue();
         }
     }
