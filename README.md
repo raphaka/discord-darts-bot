@@ -2,7 +2,7 @@
 A Discord Bot that counts your score during a game of darts
 
 ## Preparation
-- Go to disordapp.com/developers
+- Go to discordapp.com/developers
 - Create a new Application
 - Create a new Bot in this application
 - Invite your bot to your server. https://discordapp.com/developers/docs/topics/oauth2#bots

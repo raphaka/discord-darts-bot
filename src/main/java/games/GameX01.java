@@ -55,7 +55,7 @@ public class GameX01 {
                      MessageAction msg = channel.sendMessage("Busted! Remaining: ").append(String.valueOf(remaining));
                      determineNextPlayer();
                      nextPlayer = players.get(intNextPlayer);
-                     msg.append("Next player: <@").append(nextPlayer.getId()).append(">").queue();
+                     msg.append("\nNext player: <@").append(nextPlayer.getId()).append(">").queue();
                  } else {
                      scores.put(nextPlayer, scores.get(nextPlayer) - points);
                      MessageAction msg = channel.sendMessage("Remaining: ").append(scores.get(nextPlayer).toString());

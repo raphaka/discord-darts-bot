@@ -127,7 +127,7 @@ public class Match {
                 dartboardNumber++;
             }
             //create a new channel if possible
-            if (channel.getGuild().getChannels().size() == 500) {
+            if (t.getGuild().getChannels().size() == 500) {
                 // discord server limit is reached
                 return null;
             } else {
