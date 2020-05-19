@@ -38,8 +38,6 @@ public class CheckEvent extends ListenerAdapter {
                     event.getChannel().sendMessage("The match cannot be continued due to an error. Has the Darts-Bot been restarted lately?").queue();
                 }
             }
-
-
         }
     }
 }

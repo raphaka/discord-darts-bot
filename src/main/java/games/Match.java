@@ -21,6 +21,7 @@ public class Match {
     private float num_of_legs = 1; //float because it is divided by 2 or num of players in playerWonLeg()
     private int finished_legs = 0;
     private HashMap<User, Integer> legs = new HashMap<User, Integer>();
+    private int startScore = 501;
 
     public Match(TextChannel t, List<User> p, int n_o_legs) {
         this.players = p;
@@ -37,7 +38,9 @@ public class Match {
             msg.append("<@").append(player.getId()).append("> ");
         }
         msg.append("\nNumber of Legs: ").append(String.valueOf(n_o_legs)).queue();
-        channel.sendMessage("A new game is about to start. Type your score as the first player or type '!random'").queue();
+        channel.sendMessage("A new game is about to start. Type your score to begin as the first player." +
+                "\nType '!random' to let the bot choose who begins." +
+                "\nType '!startscore' to play with a different score than 501.").queue();
     }
 
     //updates legs count for player, determines if/how game is finished + quits match or starts new leg
@@ -74,7 +77,7 @@ public class Match {
 
         determineNextPlayer();
         //starter as param
-        curGame = new GameX01(channel, this.players, intNextPlayer);
+        curGame = new GameX01(channel, this.players, intNextPlayer, startScore);
     }
 
     //create new game and score for the first player
@@ -85,9 +88,9 @@ public class Match {
                 // random player begins
                 Random R = new Random();
                 intNextPlayer = R.nextInt(players.size());
-                curGame = new GameX01(channel, players, intNextPlayer);
+                curGame = new GameX01(channel, players, intNextPlayer,startScore);
             } else {
-                curGame = new GameX01(channel, players, intNextPlayer);
+                curGame = new GameX01(channel, players, intNextPlayer,startScore);
                 channel.sendMessage(players.get(intNextPlayer).getName()).append(" scored ").append(String.valueOf(points)).append(" points").queue();
                 curGame.score(points,u);
             }
@@ -148,5 +151,6 @@ public class Match {
     public boolean isWaitingForStart() {
         return waitingForStart;
     }
+    public void setStartScore(int s) { this.startScore = s; }
 
 }

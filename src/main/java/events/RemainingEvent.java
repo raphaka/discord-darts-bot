@@ -9,6 +9,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 public class RemainingEvent extends ListenerAdapter {
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         String[] msg = event.getMessage().getContentRaw().split(" ");
+        if (msg.length < 2){
+            return;
+        }
         if (msg[0].equalsIgnoreCase("remaining") || msg[0].equalsIgnoreCase("rest") || msg[0].equalsIgnoreCase("r")) {
             int rem;
             try{

@@ -9,6 +9,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 public class CorrectEvent extends ListenerAdapter {
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         String[] msg = event.getMessage().getContentRaw().split(" ");
+        if (msg.length < 2){
+            return;
+        }
         if (msg[0].equalsIgnoreCase("correct") || msg[0].equalsIgnoreCase("correction") || msg[0].equalsIgnoreCase("cor")) {
             int cor;
             try{

@@ -21,17 +21,18 @@ public class GameX01 {
      * The category of the channel is Dartboard (will be created if not existing)
      * A new channel in this category will be created or an old one will be used
      */
-    public GameX01(TextChannel t, List<User> players, int starter){
+    public GameX01(TextChannel t, List<User> players, int starter, int startScore){
         this.channel = t;
         this.players = players;
-        this.startScore = 501; //TODO option to customize
+        this.startScore = startScore;
         // set startscore for all players
         for (User player : players) {
             this.scores.put(player, startScore);
         }
         intNextPlayer = starter;
         User nextPlayer = players.get(intNextPlayer);
-        channel.sendMessage(nextPlayer.getName()).append(" to throw first.\nGame on.").queue();
+        channel.sendMessage("A new leg started. Score: ").append(String.valueOf(startScore)).append("\n")
+                .append(nextPlayer.getName()).append(" to throw first.\nGame on.").queue();
     }
 
     /*
