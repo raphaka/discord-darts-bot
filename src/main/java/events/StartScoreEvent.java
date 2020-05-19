@@ -27,6 +27,9 @@ public class StartScoreEvent extends ListenerAdapter {
             if (m != null) {
                 if (m.isWaitingForStart()){
                     if (stsc > 1) {
+                        if (stsc == 42 || stsc == 69 || stsc == 420 || stsc == 1337 || stsc == 80085){
+                            event.getChannel().sendMessage("NICE :)").queue();
+                        }
                         m.setStartScore(stsc);
                         event.getChannel().sendMessage("Start score has been set to ").append(String.valueOf(stsc)).queue();
                     } else {

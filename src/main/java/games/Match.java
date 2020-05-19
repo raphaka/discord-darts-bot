@@ -1,41 +1,42 @@
 package games;
 
+import Entities.Player;
 import Managers.MatchManager;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public class Match {
 
-    private TextChannel channel;
+    private final TextChannel channel;
     private GameX01 curGame;
-    private List<User> players;
+    private final List<Player> players;
     private int intNextPlayer;
     private boolean waitingForStart = true;
     private float num_of_legs = 1; //float because it is divided by 2 or num of players in playerWonLeg()
     private int finished_legs = 0;
-    private HashMap<User, Integer> legs = new HashMap<User, Integer>();
+    private final HashMap<Player, Integer> legs = new HashMap<>();
     private int startScore = 501;
 
-    public Match(TextChannel t, List<User> p, int n_o_legs) {
-        this.players = p;
+    public Match(TextChannel t, List<User> users, int n_o_legs) {
+        this.players = new ArrayList<>();
+        for (User u : users){
+            this.players.add(new Player(u));
+        }
         this.channel = useCreateDartboard(t);
         if (this.channel == null){
-            t.sendMessage("Match could not be created. No channel found and server limit reached.");
+            t.sendMessage("Match could not be created. No channel found and server limit reached.").queue();
             return;
         }
         MatchManager.getInstance().addMatch(this.channel, this);
         this.num_of_legs = n_o_legs;
         MessageAction msg = t.sendMessage("A new match started.\nChannel: <#").append(channel.getId()).append(">\nPlayers: ");
-        for (User player : players) {
+        for (Player player : players) {
             this.legs.put(player, 0);
-            msg.append("<@").append(player.getId()).append("> ");
+            msg = msg.append("<@").append(player.getId()).append("> ");
         }
         msg.append("\nNumber of Legs: ").append(String.valueOf(n_o_legs)).queue();
         channel.sendMessage("A new game is about to start. Type your score to begin as the first player." +
@@ -44,13 +45,13 @@ public class Match {
     }
 
     //updates legs count for player, determines if/how game is finished + quits match or starts new leg
-    public void playerWonLeg(User winner){
+    public void playerWonLeg(Player winner){
         finished_legs ++;
         legs.put(winner, legs.get(winner) + 1);
         MessageAction msg = channel.sendMessage("Won Legs: \n");
         boolean draw = true; // assume draw until any player in loop has different score than required for draw
-        for (User player : players) {
-            msg.append(player.getName()).append(":   ").append(String.valueOf(legs.get(player))).append("\n");
+        for (Player player : players) {
+            msg = msg.append(player.getName()).append(":   ").append(String.valueOf(legs.get(player))).append("\n");
             if (legs.get(player) != num_of_legs/players.size()){
                 draw = false;
             }
@@ -82,7 +83,8 @@ public class Match {
 
     //create new game and score for the first player
     public void startMatch(int points, User u){
-        intNextPlayer = players.indexOf(u);
+        Player p = getPlayerByUser(u);
+        intNextPlayer = players.indexOf(p);
         if (intNextPlayer != -1){
             if (points == -1){
                 // random player begins
@@ -139,13 +141,22 @@ public class Match {
         }
     }
 
+    private Player getPlayerByUser(User user){
+        for (Player player : players) {
+            if(player.getId().equals(user.getId())){
+                return player;
+            }
+        }
+        return null;
+    }
+
     public GameX01 getCurrentGame(){
         return this.curGame;
     }
     public TextChannel getChannel(){
         return this.channel;
     }
-    public Set<User> getPlayers(){
+    public Set<Player> getPlayers(){
         return legs.keySet();
     }
     public boolean isWaitingForStart() {

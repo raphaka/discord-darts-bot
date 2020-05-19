@@ -36,7 +36,7 @@ public class MatchEvent extends ListenerAdapter {
         // prompt if no opponent is chosen
         List<User> mentioned = event.getMessage().getMentionedUsers();
         int numPlayers = mentioned.size();
-        List<User> players = new ArrayList<User>();
+        List<User> players = new ArrayList<>();
         if (numPlayers > 0) {
             players.add(event.getMessage().getAuthor());
             players.addAll(mentioned);
@@ -47,9 +47,9 @@ public class MatchEvent extends ListenerAdapter {
 
         // Start new match
         if (MatchManager.getInstance().getMatchByChannel(event.getChannel())==null) {
-            Match m = new Match(event.getChannel(), players, legs);
+            new Match(event.getChannel(), players, legs);
         } else {
-            event.getChannel().sendMessage("A match is currently running in this channel. Please wait for the current game to finish.").queue();
+            event.getChannel().sendMessage("A match is currently running in this channel. Please wait for the current match to finish.").queue();
         }
     }
 }
