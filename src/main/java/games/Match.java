@@ -2,12 +2,10 @@ package games;
 
 import Entities.Player;
 import Managers.MatchManager;
-import com.iwebpp.crypto.TweetNaclFast;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 import java.awt.Color;
 import java.util.*;
@@ -30,6 +28,8 @@ public class Match {
         for (User u : users){
             this.players.add(new Player(u));
         }
+        //this.channel is where the match takes place
+        //t is the channel from which the match was started
         this.channel = useCreateDartboard(t);
         if (this.channel == null){
             t.sendMessage("Match could not be created. No channel found and server limit reached.").queue();
@@ -37,59 +37,84 @@ public class Match {
         }
         MatchManager.getInstance().addMatch(this.channel, this);
         this.num_of_legs = n_o_legs;
-        MessageAction msg = t.sendMessage("A new match started.\nChannel: <#").append(channel.getId()).append(">\nPlayers: ");
+        String instructions = "Type your score to begin as the first player." +
+                "\nType '!random' to let the bot choose who begins." +
+                "\nType '!startscore' to play with a different score than 501.";
+        EmbedBuilder eb = new EmbedBuilder().setColor(Color.blue).setTitle("A new match started");
+        StringBuilder sb = new StringBuilder();
         for (Player player : players) {
             this.legs.put(player, 0);
             player.initMatch();
-            msg = msg.append("<@").append(player.getId()).append("> ");
+            sb.append("<@").append(player.getId()).append("> ");
         }
-        msg.append("\nNumber of Legs: ").append(String.valueOf(n_o_legs)).queue();
-        channel.sendMessage("A new leg is about to start. Type your score to begin as the first player." +
-                "\nType '!random' to let the bot choose who begins." +
-                "\nType '!startscore' to play with a different score than 501.").queue();
+        eb.addField("Players",sb.toString(),false);
+        eb.addField("Number of Legs",String.valueOf(n_o_legs),false);
+        //append start instructions to embed if started from dartboard channel
+        //create separate embed in dartboard channel if started from other channel
+        if(t == this.channel){
+            eb.appendDescription(instructions);
+            channel.sendMessage(eb.build()).queue();
+        } else {
+            eb.addField("Channel", "<#" + channel.getId() + ">", false);
+            t.sendMessage(eb.build()).queue();
+            eb.appendDescription(instructions);
+            eb.getFields().remove(2);
+            channel.sendMessage(eb.build()).queue();
+        }
+
     }
 
     //updates legs count for player, determines if/how game is finished + quits match or starts new leg
-    public void playerWonLeg(Player winner){
+    public void playerWonLeg(Player winner, int darts){
         finished_legs ++;
         legs.put(winner, legs.get(winner) + 1);
-        MessageAction msg = channel.sendMessage("Stats: \n");
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setColor(Color.green);
+        eb.setTitle("Leg Stats");
+        StringBuilder sb = new StringBuilder("Game shot by <@").append(winner.getId());
+        if(darts == 1){
+            sb.append("> with the first dart");
+        }else if(darts == 2){
+            sb.append("> with the second dart");
+        }else if(darts == 3){
+            sb.append("> with the third dart");
+        }
+        eb.setDescription(sb.toString());
         boolean draw = true; // assume draw until any player in loop has different score than required for draw
         for (Player player : players) {
             //print leg stats
             HashMap<String, Integer> playerLegStats = player.getLegStats();
             double playerAvg = (double)playerLegStats.get("Scored")/playerLegStats.get("Darts")*3;
-            msg = msg.append(player.getName()).append(":   Legs: ").append(String.valueOf(legs.get(player)))
-                    .append(" | Avg: ").append(String.format("%.2f", playerAvg))
-                    .append(" | Highest: ").append(String.valueOf(playerLegStats.get("Highest")))
-                    .append(" | Darts: ").append(String.valueOf(playerLegStats.get("Darts")))
-                    .append(" | 100-139: ").append(String.valueOf(playerLegStats.get("100+")))
-                    .append(" | 140-179: ").append(String.valueOf(playerLegStats.get("140+")))
-                    .append(" | 180: ").append(String.valueOf(playerLegStats.get("180")))
-                    .append("\n");
+            String legStatsStr = "Legs: " + legs.get(player) +
+                    " | Avg: " + String.format("%.2f", playerAvg) +
+                    " | Highest: " + playerLegStats.get("Highest") +
+                    " | Darts: " + playerLegStats.get("Darts") +
+                    " | 100+: " + playerLegStats.get("100+") +
+                    " | 140+: " + playerLegStats.get("140+") +
+                    " | 180: " + playerLegStats.get("180");
+            eb.addField(player.getName(), legStatsStr, false);
+            // determine if a player has different score than required for draw
             if (legs.get(player) != num_of_legs/players.size()){
-                draw = false; // a player has different score than required for draw
+                draw = false;
             }
             //update matchStats
             player.finishLeg();
         }
-        msg.queue();
+        channel.sendMessage(eb.build()).queue();
 
         if (legs.get(winner) > num_of_legs/2.0){
-            channel.sendMessage(winner.getName()).append(" has won the match.").queue();
-            finishMatch();
+            finishMatch(winner, false);
             return;
         }
 
         if (draw){
-            channel.sendMessage("It's a draw.").queue();
-            finishMatch();
+            finishMatch(null, true);
             return;
         }
 
+        //match with more than two players finished
         if (finished_legs == num_of_legs){
-            channel.sendMessage("Match has finished.").queue();
-            finishMatch();
+            finishMatch(null, false);
             return;
         }
 
@@ -98,23 +123,30 @@ public class Match {
         curGame = new GameX01(channel, this.players, intNextPlayer, startScore);
     }
 
-    private void finishMatch(){
+    private void finishMatch(Player winner, boolean draw){
         if(num_of_legs > 1) {
-            EmbedBuilder eb = new EmbedBuilder();
-            eb.setColor(Color.blue);
-            eb.setTitle("Match Stats");
+            EmbedBuilder eb = new EmbedBuilder().setColor(Color.blue).setTitle("Match Stats");
+            if(draw){
+                eb.setDescription("It's a draw.");
+            }else{
+                if (winner != null){
+                    eb.setDescription(winner.getName()).appendDescription("won the match.");
+                } else {
+                    eb.setDescription("Match has finished.");
+                }
+            }
             for (Player p : this.players) {
                 //format MatchStats into embed field
                 HashMap<String, Integer> playerMatchStats = p.getMatchStats();
                 double playerAvg = (double) playerMatchStats.get("Scored") / playerMatchStats.get("Darts") * 3;
-                StringBuilder sb = new StringBuilder("Legs: ").append(legs.get(p))
-                        .append(" | Avg: ").append(String.format("%.2f", playerAvg))
-                        .append(" | Highest: ").append(String.valueOf(playerMatchStats.get("Highest")))
-                        .append(" | Darts: ").append(String.valueOf(playerMatchStats.get("Darts")))
-                        .append(" | 100-139: ").append(String.valueOf(playerMatchStats.get("100+")))
-                        .append(" | 140-179: ").append(String.valueOf(playerMatchStats.get("140+")))
-                        .append(" | 180: ").append(String.valueOf(playerMatchStats.get("180")));
-                eb.addField(p.getName(), sb.toString(), false);
+                String matchStatsStr = "Legs: " + legs.get(p) +
+                        " | Avg: " + String.format("%.2f", playerAvg) +
+                        " | Highest: " + playerMatchStats.get("Highest") +
+                        " | Darts: " + playerMatchStats.get("Darts") +
+                        " | 100-139: " + playerMatchStats.get("100+") +
+                        " | 140-179: " + playerMatchStats.get("140+") +
+                        " | 180: " + playerMatchStats.get("180");
+                eb.addField(p.getName(), matchStatsStr, false);
             }
             channel.sendMessage(eb.build()).queue();
         }
