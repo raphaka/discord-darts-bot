@@ -2,6 +2,7 @@ package games;
 
 import Entities.Player;
 import Managers.MatchManager;
+import com.iwebpp.crypto.TweetNaclFast;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -48,12 +49,21 @@ public class Match {
     public void playerWonLeg(Player winner){
         finished_legs ++;
         legs.put(winner, legs.get(winner) + 1);
-        MessageAction msg = channel.sendMessage("Won Legs: \n");
+        MessageAction msg = channel.sendMessage("Stats: \n");
         boolean draw = true; // assume draw until any player in loop has different score than required for draw
         for (Player player : players) {
-            msg = msg.append(player.getName()).append(":   ").append(String.valueOf(legs.get(player))).append("\n");
+            HashMap<String, Integer> playerLegStats = player.getLegStats();
+            double playerAvg = (double)playerLegStats.get("Scored")/playerLegStats.get("Darts")*3;
+            msg = msg.append(player.getName()).append(":   Legs: ").append(String.valueOf(legs.get(player)))
+                    .append(" | Avg: ").append(String.format("%.2f", playerAvg))
+                    .append(" | Highest: ").append(String.valueOf(playerLegStats.get("Highest")))
+                    .append(" | Darts: ").append(String.valueOf(playerLegStats.get("Darts")))
+                    .append(" | 100-139: ").append(String.valueOf(playerLegStats.get("100+")))
+                    .append(" | 140-179: ").append(String.valueOf(playerLegStats.get("140+")))
+                    .append(" | 180: ").append(String.valueOf(playerLegStats.get("180")))
+                    .append("\n");
             if (legs.get(player) != num_of_legs/players.size()){
-                draw = false;
+                draw = false; // a player has different score than required for draw
             }
         }
         msg.queue();

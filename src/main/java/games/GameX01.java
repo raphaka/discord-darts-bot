@@ -25,7 +25,7 @@ public class GameX01 {
         this.players = players;
         // set startscore for all players
         for (Player player : players) {
-            player.setInitialScore(startScore, 0);
+            player.initLeg(startScore, 0);
         }
         intNextPlayer = starter;
 
@@ -79,12 +79,15 @@ public class GameX01 {
             int rem = nextPlayer.getCurrentScore();
             if (darts == 1 && rem<41 && rem%2==0){
                 channel.sendMessage("GAME SHOT by <@").append(nextPlayer.getId()).append("> with the first dart").queue();
+                nextPlayer.check(1);
                 MatchManager.getInstance().getMatchByChannel(channel).playerWonLeg(nextPlayer);
             } else if (darts == 2 && (rem<99 || Arrays.stream(new int[]{100,101,104,107,110}).anyMatch(notbogey-> notbogey == rem))){
                 channel.sendMessage("GAME SHOT by <@").append(nextPlayer.getId()).append("> with the second dart").queue();
+                nextPlayer.check(2);
                 MatchManager.getInstance().getMatchByChannel(channel).playerWonLeg(nextPlayer);
             } else if (darts == 3 && (rem<159 || Arrays.stream(new int[]{170,167,164,161,160}).anyMatch(notbogey-> notbogey == rem))){
                 channel.sendMessage("GAME SHOT by <@").append(nextPlayer.getId()).append("> with the third dart").queue();
+                nextPlayer.check(3);
                 MatchManager.getInstance().getMatchByChannel(channel).playerWonLeg(nextPlayer);
             } else {
                 channel.sendMessage("Your score of ").append(String.valueOf(rem)).append(" cannot be finished with ")
@@ -118,7 +121,7 @@ public class GameX01 {
     private void validateScore(Player nextPlayer, int newScore, boolean switchPlayer){
         if (newScore == 0){
             channel.sendMessage("Finish the game by typing \"check\" and the number of darts needed, e.g. \"check 2.\n " +
-                    "You can also type \"c1\", \"c2\" or \"c3\" to save time.").queue();
+                    "You can also type \"c 1\", \"c 2\" or \"c 3\" to save time.").queue();
         } else if (newScore < 0 || newScore == 1) {
             MessageAction msg = channel.sendMessage("Busted! <@").append(nextPlayer.getId()).append("> has ").append(String.valueOf(nextPlayer.getCurrentScore())).append(" left.");
             if(switchPlayer) {
