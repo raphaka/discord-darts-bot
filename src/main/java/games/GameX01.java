@@ -79,20 +79,22 @@ public class GameX01 {
             int rem = nextPlayer.getCurrentScore();
             if (darts == 1 && rem<41 && rem%2==0){
                 channel.sendMessage("GAME SHOT by <@").append(nextPlayer.getId()).append("> with the first dart").queue();
-                nextPlayer.check(1);
-                MatchManager.getInstance().getMatchByChannel(channel).playerWonLeg(nextPlayer);
             } else if (darts == 2 && (rem<99 || Arrays.stream(new int[]{100,101,104,107,110}).anyMatch(notbogey-> notbogey == rem))){
                 channel.sendMessage("GAME SHOT by <@").append(nextPlayer.getId()).append("> with the second dart").queue();
-                nextPlayer.check(2);
-                MatchManager.getInstance().getMatchByChannel(channel).playerWonLeg(nextPlayer);
             } else if (darts == 3 && (rem<159 || Arrays.stream(new int[]{170,167,164,161,160}).anyMatch(notbogey-> notbogey == rem))){
                 channel.sendMessage("GAME SHOT by <@").append(nextPlayer.getId()).append("> with the third dart").queue();
-                nextPlayer.check(3);
-                MatchManager.getInstance().getMatchByChannel(channel).playerWonLeg(nextPlayer);
             } else {
-                channel.sendMessage("Your score of ").append(String.valueOf(rem)).append(" cannot be finished with ")
-                        .append(String.valueOf(darts)).append(" darts.").queue();
+                MessageAction msg = channel.sendMessage("Your score of ").append(String.valueOf(rem))
+                        .append(" cannot be finished with ").append(String.valueOf(darts));
+                if(darts == 1){
+                    msg.append(" dart.").queue();
+                } else {
+                    msg.append(" darts.").queue();
+                }
+                return;
             }
+            nextPlayer.check(darts);
+            MatchManager.getInstance().getMatchByChannel(channel).playerWonLeg(nextPlayer);
         }else {
             channel.sendMessage("It's <@").append(nextPlayer.getId()).append(">'s turn to throw. Please wait.").queue();
         }

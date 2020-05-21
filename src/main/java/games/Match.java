@@ -3,12 +3,15 @@ package games;
 import Entities.Player;
 import Managers.MatchManager;
 import com.iwebpp.crypto.TweetNaclFast;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
+import java.awt.Color;
 import java.util.*;
+import java.util.List;
 
 public class Match {
 
@@ -37,6 +40,7 @@ public class Match {
         MessageAction msg = t.sendMessage("A new match started.\nChannel: <#").append(channel.getId()).append(">\nPlayers: ");
         for (Player player : players) {
             this.legs.put(player, 0);
+            player.initMatch();
             msg = msg.append("<@").append(player.getId()).append("> ");
         }
         msg.append("\nNumber of Legs: ").append(String.valueOf(n_o_legs)).queue();
@@ -52,6 +56,7 @@ public class Match {
         MessageAction msg = channel.sendMessage("Stats: \n");
         boolean draw = true; // assume draw until any player in loop has different score than required for draw
         for (Player player : players) {
+            //print leg stats
             HashMap<String, Integer> playerLegStats = player.getLegStats();
             double playerAvg = (double)playerLegStats.get("Scored")/playerLegStats.get("Darts")*3;
             msg = msg.append(player.getName()).append(":   Legs: ").append(String.valueOf(legs.get(player)))
@@ -65,30 +70,55 @@ public class Match {
             if (legs.get(player) != num_of_legs/players.size()){
                 draw = false; // a player has different score than required for draw
             }
+            //update matchStats
+            player.finishLeg();
         }
         msg.queue();
 
         if (legs.get(winner) > num_of_legs/2.0){
             channel.sendMessage(winner.getName()).append(" has won the match.").queue();
-            MatchManager.getInstance().removeMatchByChannel(channel);
+            finishMatch();
             return;
         }
 
         if (draw){
             channel.sendMessage("It's a draw.").queue();
-            MatchManager.getInstance().removeMatchByChannel(channel);
+            finishMatch();
             return;
         }
 
         if (finished_legs == num_of_legs){
             channel.sendMessage("Match has finished.").queue();
-            MatchManager.getInstance().removeMatchByChannel(channel);
+            finishMatch();
             return;
         }
 
         determineNextPlayer();
         //starter as param
         curGame = new GameX01(channel, this.players, intNextPlayer, startScore);
+    }
+
+    private void finishMatch(){
+        if(num_of_legs > 1) {
+            EmbedBuilder eb = new EmbedBuilder();
+            eb.setColor(Color.blue);
+            eb.setTitle("Match Stats");
+            for (Player p : this.players) {
+                //format MatchStats into embed field
+                HashMap<String, Integer> playerMatchStats = p.getMatchStats();
+                double playerAvg = (double) playerMatchStats.get("Scored") / playerMatchStats.get("Darts") * 3;
+                StringBuilder sb = new StringBuilder("Legs: ").append(legs.get(p))
+                        .append(" | Avg: ").append(String.format("%.2f", playerAvg))
+                        .append(" | Highest: ").append(String.valueOf(playerMatchStats.get("Highest")))
+                        .append(" | Darts: ").append(String.valueOf(playerMatchStats.get("Darts")))
+                        .append(" | 100-139: ").append(String.valueOf(playerMatchStats.get("100+")))
+                        .append(" | 140-179: ").append(String.valueOf(playerMatchStats.get("140+")))
+                        .append(" | 180: ").append(String.valueOf(playerMatchStats.get("180")));
+                eb.addField(p.getName(), sb.toString(), false);
+            }
+            channel.sendMessage(eb.build()).queue();
+        }
+        MatchManager.getInstance().removeMatchByChannel(channel);
     }
 
     //create new game and score for the first player

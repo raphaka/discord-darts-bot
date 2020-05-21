@@ -10,6 +10,7 @@ public class Player {
     private int lastScore = 0;
     private int lastHighest = 0; //save highest score in case the new one gets corrected
     private final HashMap<String, Integer> legStats = new HashMap<>();
+    private final HashMap<String, Integer> matchStats = new HashMap<>();
 
     public Player(User u){
         user = u;
@@ -54,14 +55,15 @@ public class Player {
             if(s >= 100 && s <= 140){ legStats.put("100+", legStats.get("100+") + 1); }
             if(s > legStats.get("Highest")){ legStats.put("Highest",s); }
         }
-        //TODO update stats
         return newScore;
     }
 
     public void check(int d){
         legStats.put("Darts", legStats.get("Darts") + d);
         legStats.put("Scored", legStats.get("Scored") + currentScore);
-        //TODO update more stats
+        if(currentScore >= 140 && currentScore <= 170){ legStats.put("140+", legStats.get("140+") + 1); }
+        if(currentScore >= 100 && currentScore <= 140){ legStats.put("100+", legStats.get("100+") + 1); }
+        if(currentScore > legStats.get("Highest")){ legStats.put("Highest",currentScore); }
     }
 
     public void initLeg(int start, int last){
@@ -75,8 +77,33 @@ public class Player {
         legStats.put("180", 0);
     }
 
+    public void finishLeg(){
+        //add leg stats to match stats
+        matchStats.put("Darts", matchStats.get("Darts") + legStats.get("Darts"));
+        matchStats.put("Scored", matchStats.get("Scored") + legStats.get("Scored"));
+        if(legStats.get("Highest") > matchStats.get("Highest")){
+            matchStats.put("Highest", legStats.get("Highest"));
+        }
+        matchStats.put("100+", matchStats.get("100+") + legStats.get("100+"));
+        matchStats.put("140+", matchStats.get("140+") + legStats.get("140+"));
+        matchStats.put("180", matchStats.get("180") + legStats.get("180"));
+    }
+
+    public void initMatch(){
+        matchStats.put("Darts", 0);
+        matchStats.put("Scored", 0);
+        matchStats.put("Highest",0);
+        matchStats.put("100+", 0);
+        matchStats.put("140+", 0);
+        matchStats.put("180", 0);
+    }
+
     public HashMap<String, Integer> getLegStats(){
         return legStats;
+    }
+
+    public HashMap<String, Integer> getMatchStats(){
+        return matchStats;
     }
 
     public int getCurrentScore() {
