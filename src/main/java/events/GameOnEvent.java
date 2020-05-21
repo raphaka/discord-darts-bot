@@ -39,7 +39,7 @@ public class GameOnEvent extends ListenerAdapter {
             Match m = new Match(event.getChannel(), players, 1);
             MatchManager.getInstance().addMatch(m.getChannel(), m);
         } else {
-            event.getChannel().sendMessage("A match is currently running in this channel. Please wait for the current game to finish.").queue();
+            event.getChannel().sendMessage("A match is currently running in this channel. Please wait for the current match to finish.").queue();
         }
     }
 }

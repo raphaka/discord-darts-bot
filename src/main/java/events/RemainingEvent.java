@@ -27,8 +27,8 @@ public class RemainingEvent extends ListenerAdapter {
                 if (game != null) {
                     game.remaining(rem, event.getMessage().getAuthor());
                 } else {
-                    event.getChannel().sendMessage("The game cannot be continued due to an error. Has the Darts-Bot been restarted lately?").queue();
-                    System.err.println("No game found in match " + m);
+                    event.getChannel().sendMessage("The leg cannot be continued due to an error. Has the Darts-Bot been restarted lately?").queue();
+                    System.err.println("No leg found in match " + m);
                 }
             } else {
                 // Match not in hashmap, bot restarted?
