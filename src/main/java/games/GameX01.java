@@ -31,12 +31,6 @@ public class GameX01 {
             player.initLeg(startScore, 0);
         }
         intNextPlayer = starter;
-
-        Player nextPlayer = players.get(intNextPlayer);
-        EmbedBuilder eb = new EmbedBuilder().setTitle("Game on").setColor(Color.green);
-        eb.addField("First player", nextPlayer.getName(), false);
-        eb.addField("Score", String.valueOf(startScore), false);
-        channel.sendMessage(eb.build()).queue();
     }
 
     /*
@@ -48,13 +42,17 @@ public class GameX01 {
         if (u.getId().equals(nextPlayer.getId())){
             // Check if points is valid and substract from current score if not checkout or overthrown.
             if( points>180 || points < 0 || Arrays.stream(new int[]{163,166,169,172,173,175,176,178,179}).anyMatch(impossible -> impossible == points) ){
-                channel.sendMessage("This score cannot be achieved with three darts. Please submit the correct value.").queue();
+                channel.sendMessage(
+                        new EmbedBuilder().setDescription("This score cannot be achieved with three darts. Please submit the correct value.").setColor(Color.red).build()
+                ).queue();
             } else {
                 int newScore = nextPlayer.score(points);
                 validateScore(nextPlayer, newScore, true);
             }
         } else {
-            channel.sendMessage("It's <@").append(nextPlayer.getId()).append(">'s turn to throw. Please wait.").queue();
+            channel.sendMessage(
+                    new EmbedBuilder().setDescription("It's <@" + nextPlayer.getId() + ">'s turn to throw. Please wait.").setColor(Color.red).build()
+            ).queue();
         }
     }
 
@@ -66,13 +64,17 @@ public class GameX01 {
         if (u.getId().equals(nextPlayer.getId())){
             int points = nextPlayer.getCurrentScore() - rem;
             if (points < 0 || points > 180 || Arrays.stream(new int[]{163,166,169,172,173,175,176,178,179}).anyMatch(impossible-> impossible == points)){
-                channel.sendMessage("Your score of ").append(String.valueOf(points)).append(" cannot be achieved with three darts. Please correct your input.").queue();
+                channel.sendMessage(
+                        new EmbedBuilder().setDescription("This score cannot be achieved with three darts. Please submit the correct value.").setColor(Color.red).build()
+                ).queue();
             } else {
                 int newScore = nextPlayer.score(points);
                 validateScore(nextPlayer, newScore, true);
             }
         } else {
-            channel.sendMessage("It's <@").append(nextPlayer.getId()).append(">'s turn to throw. Please wait.").queue();
+            channel.sendMessage(
+                    new EmbedBuilder().setDescription("It's <@" + nextPlayer.getId() + ">'s turn to throw. Please wait.").setColor(Color.red).build()
+            ).queue();
         }
     }
 
@@ -91,16 +93,19 @@ public class GameX01 {
                 MatchManager.getInstance().getMatchByChannel(channel).playerWonLeg(nextPlayer, darts);
             } else {
                 //TODO as red error embed
-                MessageAction msg = channel.sendMessage("Your score of ").append(String.valueOf(rem))
-                        .append(" cannot be finished with ").append(String.valueOf(darts));
+                EmbedBuilder eb = new EmbedBuilder().setColor(Color.red).setDescription("Your score of " + rem
+                        + " cannot be finished with " + darts);
                 if(darts == 1){
-                    msg.append(" dart.").queue();
+                    eb.appendDescription(" dart.");
                 } else {
-                    msg.append(" darts.").queue();
+                    eb.appendDescription(" darts.");
                 }
+                channel.sendMessage(eb.build()).queue();
             }
         }else {
-            channel.sendMessage("It's <@").append(nextPlayer.getId()).append(">'s turn to throw. Please wait.").queue();
+            channel.sendMessage(
+                    new EmbedBuilder().setDescription("It's <@" + nextPlayer.getId() + ">'s turn to throw. Please wait.").setColor(Color.red).build()
+            ).queue();
         }
     }
 
@@ -159,6 +164,10 @@ public class GameX01 {
         if (++intNextPlayer >= this.players.size()){
             intNextPlayer = 0;
         }
+    }
+
+    public List<Player> getPlayers() {
+        return players;
     }
 }
 

@@ -162,9 +162,11 @@ public class Match {
                 // random player begins
                 Random R = new Random();
                 intNextPlayer = R.nextInt(players.size());
-                curGame = new GameX01(channel, players, intNextPlayer,startScore);
+                curGame = new GameX01(channel, players, intNextPlayer, startScore);
+                EmbedBuilder eb = new EmbedBuilder().setColor(Color.green).setDescription(curGame.getPlayers().get(intNextPlayer).getName()).appendDescription(" to throw first.");
+                channel.sendMessage(eb.build()).queue();
             } else {
-                curGame = new GameX01(channel, players, intNextPlayer,startScore);
+                curGame = new GameX01(channel, players, intNextPlayer, startScore);
                 channel.sendMessage(players.get(intNextPlayer).getName()).append(" scored ").append(String.valueOf(points)).append(" points").queue();
                 curGame.score(points,u);
             }

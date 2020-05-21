@@ -1,22 +1,26 @@
 package events;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.awt.*;
 import java.io.File;
 import java.util.Scanner;
 
 public class HelpEvent extends ListenerAdapter {
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         if(event.getMessage().getContentRaw().equalsIgnoreCase("!help")){
-            event.getChannel().sendMessage("Available commands: \n" +
-                    "!gameon @opponent - play a single game of 501 Double out against @opponent (alias: !go)\n" +
-                    "!bestof <legs> @opponent - play a match with multiple legs against @opponent (aliases: !bo, !match, !m)\n" +
-                    "XY - you scored XY points\n" +
-                    "remaining XY - your remaining score is XY points (aliases: r XY, rest XY)\n" +
-                    "check Y - you checked out with Y darts (alias: c Y)\n" +
-                    "correct XY - manually input your remaining score at any time to correct it (aliases: cor, correction)\n" +
-                    "!quit - abandon the current match").queue();
+            EmbedBuilder eb = new EmbedBuilder().setColor(Color.white)
+                    .addField("!gameon @opponent","play a single game of 501 Double out against @opponent (alias: !go)",false)
+                    .addField("!bestof <legs> @opponent", "play a match with multiple legs against @opponent (aliases: !bo, !match, !m)", false)
+                    .addField("<number>", "you scored <number> points", false)
+                    .addField("remaining <number>", "your remaining score is <number> points (aliases: r <number>, rest <number>)", false)
+                    .addField("check <number>", "you checked out with Y darts (alias: c Y)",false)
+                    .addField("correct <number>", "correct the value of your last throw to <number>", false)
+                    .addField("!quit", "abandon the current match", false)
+                    .setTitle("Available commands");
+            event.getChannel().sendMessage(eb.build()).queue();
         }
     }
 }
