@@ -22,7 +22,7 @@ public class MatchEvent extends ListenerAdapter {
         }
         // prompt if too few arguments or second arg is not Integer
         if (messageSent.length < 2){
-            event.getChannel(). sendMessage("Please set the number of legs with !bestof <legs> @<opponent>").queue();
+            event.getChannel(). sendMessage("Please set the number of legs with !bestof <legs> @ <opponent>").queue();
             return;
         }
         int legs;

@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class StartScoreEvent extends ListenerAdapter {
     public void onGuildMessageReceived(GuildMessageReceivedEvent event){
-        int stsc = 501;
+        int stsc;
         String[] msg = event.getMessage().getContentRaw().split(" ");
         if (msg.length < 2){
             return;
@@ -31,7 +31,7 @@ public class StartScoreEvent extends ListenerAdapter {
             if (m != null) {
                 //check if user is allowed to set start score
                 boolean allowed = false;
-                //check if user is a player of the game
+                //check if user is a player of the match
                 for(Player p : m.getPlayers()){
                     if (event.getAuthor().getId().equals(p.getId())) {
                         allowed = true;
