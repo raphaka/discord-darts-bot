@@ -2,10 +2,14 @@ package Entities;
 
 import net.dv8tion.jda.api.entities.User;
 
+import java.util.HashMap;
+
 public class Player {
     private final User user;
     private int currentScore;
-    private int lastScore;
+    private int lastScore = 0;
+
+    //TODO private HashMap<String, Integer> legStats = new HashMap<>();
 
     public Player(User u){
         user = u;
@@ -21,14 +25,27 @@ public class Player {
         }
         return newScore;
     }
+    public int correctLast(int s){
+        int newScore =  lastScore - s;
+        //only save new score if it is valid
+        if(newScore > 1){
+            currentScore = newScore;
+        }
+        return newScore;
+    }
 
-    public void setCurrentScore(int s){
-        currentScore = s;
+    public void setInitialScore(int start, int last){
+        currentScore = start;
+        lastScore = last;
     }
 
     public int getCurrentScore() {
         return currentScore;
     }
+
+//    TODO public void resetLegStats(){
+//
+//    }
 
     //return value from JDA object
     public String getId(){

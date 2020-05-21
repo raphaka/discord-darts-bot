@@ -39,7 +39,7 @@ public class Match {
             msg = msg.append("<@").append(player.getId()).append("> ");
         }
         msg.append("\nNumber of Legs: ").append(String.valueOf(n_o_legs)).queue();
-        channel.sendMessage("A new game is about to start. Type your score to begin as the first player." +
+        channel.sendMessage("A new leg is about to start. Type your score to begin as the first player." +
                 "\nType '!random' to let the bot choose who begins." +
                 "\nType '!startscore' to play with a different score than 501.").queue();
     }
@@ -71,7 +71,7 @@ public class Match {
         }
 
         if (finished_legs == num_of_legs){
-            channel.sendMessage("Game has finished.").queue();
+            channel.sendMessage("Match has finished.").queue();
             MatchManager.getInstance().removeMatchByChannel(channel);
             return;
         }

@@ -14,7 +14,6 @@ public class GameX01 {
     private final TextChannel channel;
     private int intNextPlayer;
     private final List<Player> players;
-    private final int startScore;
 
     /*
      * Constructor sets the channel to be used.
@@ -24,12 +23,12 @@ public class GameX01 {
     public GameX01(TextChannel t, List<Player> players, int starter, int startScore){
         this.channel = t;
         this.players = players;
-        this.startScore = startScore;
         // set startscore for all players
         for (Player player : players) {
-            player.setCurrentScore(startScore);
+            player.setInitialScore(startScore, 0);
         }
         intNextPlayer = starter;
+
         Player nextPlayer = players.get(intNextPlayer);
         channel.sendMessage("A new leg started. Score: ").append(String.valueOf(startScore)).append("\n")
                 .append(nextPlayer.getName()).append(" to throw first.\nGame on.").queue();
@@ -47,7 +46,7 @@ public class GameX01 {
                 channel.sendMessage("This score cannot be achieved with three darts. Please submit the correct value.").queue();
             } else {
                 int newScore = nextPlayer.score(points);
-                validateScore(nextPlayer, newScore);
+                validateScore(nextPlayer, newScore, true);
             }
         } else {
             channel.sendMessage("It's <@").append(nextPlayer.getId()).append(">'s turn to throw. Please wait.").queue();
@@ -65,7 +64,7 @@ public class GameX01 {
                 channel.sendMessage("Your score of ").append(String.valueOf(points)).append(" cannot be achieved with three darts. Please correct your input.").queue();
             } else {
                 int newScore = nextPlayer.score(points);
-                validateScore(nextPlayer, newScore);
+                validateScore(nextPlayer, newScore, true);
             }
         } else {
             channel.sendMessage("It's <@").append(nextPlayer.getId()).append(">'s turn to throw. Please wait.").queue();
@@ -98,27 +97,40 @@ public class GameX01 {
 
     //corrects the players score.
     //Corrected Score is not validated mathematically
-    public void correction(int cor, User u) {
-        channel.sendMessage("Not implemented yet. Score could not be updated manually.").queue();
-        Player p = getPlayerByUser(u);
+    public void correction(int points, User u) {
+        if( points > 180 || points < 0 || Arrays.stream(new int[]{163,166,169,172,173,175,176,178,179}).anyMatch(impossible -> impossible == points) ){
+            channel.sendMessage("This score cannot be achieved with three darts. Please submit the correct value.").queue();
+        } else {
+            Player p = getPlayerByUser(u);
+            if(p != null) {
+                int newScore = p.correctLast(points);
+                validateScore(p, newScore, false);
+            } else {
+                channel.sendMessage("Score could not be updated manually. User is not a player of this match.").queue();
+            }
+        }
     }
 
     /*
      * prompts user to use check command if remaining would be set to 0
      * validates score to avoid impossible values
      */
-    private void validateScore(Player nextPlayer, int newScore){
+    private void validateScore(Player nextPlayer, int newScore, boolean switchPlayer){
         if (newScore == 0){
             channel.sendMessage("Finish the game by typing \"check\" and the number of darts needed, e.g. \"check 2.\n " +
                     "You can also type \"c1\", \"c2\" or \"c3\" to save time.").queue();
         } else if (newScore < 0 || newScore == 1) {
             MessageAction msg = channel.sendMessage("Busted! <@").append(nextPlayer.getId()).append("> has ").append(String.valueOf(nextPlayer.getCurrentScore())).append(" left.");
-            determineNextPlayer();
+            if(switchPlayer) {
+                determineNextPlayer();
+            }
             nextPlayer = players.get(intNextPlayer);
             msg.append("\nNext player: <@").append(nextPlayer.getId()).append(">\nYou require ").append(String.valueOf(nextPlayer.getCurrentScore())).append(".").queue();
         } else {
             MessageAction msg = channel.sendMessage("<@").append(nextPlayer.getId()).append("> has ").append(String.valueOf(nextPlayer.getCurrentScore())).append(" left.");
-            determineNextPlayer();
+            if(switchPlayer) {
+                determineNextPlayer();
+            }
             nextPlayer = players.get(intNextPlayer);
             msg.append("\nNext player: <@").append(nextPlayer.getId()).append(">\nYou require ").append(String.valueOf(nextPlayer.getCurrentScore())).append(".").queue();
         }
