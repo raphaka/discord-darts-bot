@@ -4,10 +4,8 @@ import net.dv8tion.jda.api.JDABuilder;
 
 public class Main {
 
-    private static JDA jda;
-
     public static void main(String[] args) throws javax.security.auth.login.LoginException{
-        jda = new JDABuilder(args[0]).build();
+        JDA jda = new JDABuilder(args[0]).build();
         jda.addEventListener(new GameOnEvent());
         jda.addEventListener(new MatchEvent());
         jda.addEventListener(new RandomEvent());

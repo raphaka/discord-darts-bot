@@ -32,7 +32,9 @@ public class Match {
         //t is the channel from which the match was started
         this.channel = useCreateDartboard(t);
         if (this.channel == null){
-            t.sendMessage("Match could not be created. No channel found and server limit reached.").queue();
+            t.sendMessage(
+                    new EmbedBuilder().setDescription("Match could not be created. No channel found and server limit reached.").setColor(Color.red).build()
+            ).queue();
             return;
         }
         MatchManager.getInstance().addMatch(this.channel, this);
@@ -53,14 +55,13 @@ public class Match {
         //create separate embed in dartboard channel if started from other channel
         if(t == this.channel){
             eb.appendDescription(instructions);
-            channel.sendMessage(eb.build()).queue();
         } else {
             eb.addField("Channel", "<#" + channel.getId() + ">", false);
             t.sendMessage(eb.build()).queue();
             eb.appendDescription(instructions);
             eb.getFields().remove(2);
-            channel.sendMessage(eb.build()).queue();
         }
+        channel.sendMessage(eb.build()).queue();
 
     }
 

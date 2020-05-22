@@ -2,10 +2,12 @@ package events;
 
 import Managers.MatchManager;
 import games.Match;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,12 +27,14 @@ public class GameOnEvent extends ListenerAdapter {
         // prompt if no opponent is chosen
         List<User> mentioned = event.getMessage().getMentionedUsers();
         int numPlayers = mentioned.size();
-        List<User> players = new ArrayList<User>();
+        List<User> players = new ArrayList<>();
         if (numPlayers > 0) {
             players.add(event.getMessage().getAuthor());
             players.addAll(mentioned);
         } else {
-            event.getChannel().sendMessage("You have to choose at least one opponent. Challenge the other user with !gameon @<username>").queue();
+            event.getChannel().sendMessage(
+                    new EmbedBuilder().setDescription("You have to choose at least one opponent. Challenge the other user with !gameon @<username>").setColor(Color.red).build()
+            ).queue();
             return;
         }
 
@@ -39,7 +43,9 @@ public class GameOnEvent extends ListenerAdapter {
             Match m = new Match(event.getChannel(), players, 1);
             MatchManager.getInstance().addMatch(m.getChannel(), m);
         } else {
-            event.getChannel().sendMessage("A match is currently running in this channel. Please wait for the current match to finish.").queue();
+            event.getChannel().sendMessage(
+                    new EmbedBuilder().setDescription("A match is currently running in this channel. Please wait for the current match to finish.").setColor(Color.red).build()
+            ).queue();
         }
     }
 }

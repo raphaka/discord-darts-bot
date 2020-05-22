@@ -3,8 +3,11 @@ package events;
 import Managers.MatchManager;
 import games.GameX01;
 import games.Match;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+
+import java.awt.*;
 
 public class RemainingEvent extends ListenerAdapter {
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
@@ -27,13 +30,17 @@ public class RemainingEvent extends ListenerAdapter {
                 if (game != null) {
                     game.remaining(rem, event.getMessage().getAuthor());
                 } else {
-                    event.getChannel().sendMessage("The leg cannot be continued due to an error. Has the Darts-Bot been restarted lately?").queue();
+                    event.getChannel().sendMessage(
+                            new EmbedBuilder().setDescription("The leg cannot be continued due to an error. Has the Darts-Bot been restarted lately?").setColor(Color.red).build()
+                    ).queue();
                     System.err.println("No leg found in match " + m);
                 }
             } else {
                 // Match not in hashmap, bot restarted?
                 if (event.getGuild().getCategoriesByName("Dartboards", true).contains(event.getChannel().getParent())) {
-                    event.getChannel().sendMessage("The match cannot be continued due to an error. Has the Darts-Bot been restarted lately?").queue();
+                    event.getChannel().sendMessage(
+                            new EmbedBuilder().setDescription("The match cannot be continued due to an error. Has the Darts-Bot been restarted lately?").setColor(Color.red).build()
+                    ).queue();
                 }
             }
         }

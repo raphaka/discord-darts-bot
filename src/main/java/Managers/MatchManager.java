@@ -4,7 +4,6 @@ import games.Match;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 /*
@@ -14,10 +13,10 @@ import java.util.Set;
 public final class MatchManager {
     private static volatile MatchManager instance;
 
-    private HashMap<TextChannel, Match> games;
+    private final HashMap<TextChannel, Match> games;
 
     private MatchManager() {
-        this.games  = new HashMap<TextChannel, Match>();
+        this.games  = new HashMap<>();
     }
 
     // Get the only instance of this class

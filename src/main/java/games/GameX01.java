@@ -92,7 +92,6 @@ public class GameX01 {
                 nextPlayer.check(darts);
                 MatchManager.getInstance().getMatchByChannel(channel).playerWonLeg(nextPlayer, darts);
             } else {
-                //TODO as red error embed
                 EmbedBuilder eb = new EmbedBuilder().setColor(Color.red).setDescription("Your score of " + rem
                         + " cannot be finished with " + darts);
                 if(darts == 1){
@@ -113,14 +112,18 @@ public class GameX01 {
     //Corrected Score is not validated mathematically
     public void correction(int points, User u) {
         if( points > 180 || points < 0 || Arrays.stream(new int[]{163,166,169,172,173,175,176,178,179}).anyMatch(impossible -> impossible == points) ){
-            channel.sendMessage("This score cannot be achieved with three darts. Please submit the correct value.").queue();
+            channel.sendMessage(
+                    new EmbedBuilder().setDescription("This score cannot be achieved with three darts. Please submit the correct value.").setColor(Color.red).build()
+            ).queue();
         } else {
             Player p = getPlayerByUser(u);
             if(p != null) {
                 int newScore = p.correctLast(points);
                 validateScore(p, newScore, false);
             } else {
-                channel.sendMessage("Score could not be updated manually. User is not a player of this match.").queue();
+                channel.sendMessage(
+                        new EmbedBuilder().setDescription("Score could not be updated. User is not a player of this match.").setColor(Color.red).build()
+                ).queue();
             }
         }
     }
