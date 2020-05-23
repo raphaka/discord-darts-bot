@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class MatchEvent extends ListenerAdapter {
                 ||messageSent[0].equalsIgnoreCase("!m"))) {
             return;
         }
-        // prompt if too few arguments or second arg is not Integer
+        // prompt if too few arguments or second arg is not valid Integer
         if (messageSent.length < 2){
             event.getChannel().sendMessage(
                     new EmbedBuilder().setDescription("Please set the number of legs with !bestof <legs> @ <opponent>").setColor(Color.red).build()
@@ -34,10 +35,16 @@ public class MatchEvent extends ListenerAdapter {
             legs = Integer.parseInt(messageSent[1]);
         } catch (NumberFormatException e) {
             event.getChannel().sendMessage(
-                    new EmbedBuilder().setDescription(messageSent[1] + "is not a valid number of legs. Please set the number of legs with !bestof <legs> @<opponent>").setColor(Color.red).build()
+                    new EmbedBuilder().setDescription(messageSent[1] + " is not a valid number of legs. Please set the number of legs with !bestof <legs> @<opponent>").setColor(Color.red).build()
             ).queue();
             return;
             // if message cannot be parsed as an Integer, it is not meant to be processed by this handler
+        }
+        if (legs < 1){
+            event.getChannel().sendMessage(
+                    new EmbedBuilder().setDescription(messageSent[1] + " is not a valid number of legs. Please set the number of legs with !bestof <legs> @<opponent>").setColor(Color.red).build()
+            ).queue();
+            return;
         }
         // prompt if no opponent is chosen
         List<User> users = new ArrayList<>();
