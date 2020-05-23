@@ -24,23 +24,25 @@ public class GameOnEvent extends ListenerAdapter {
         if (!(messageSent[0].equalsIgnoreCase("!gameon") || messageSent[0].equalsIgnoreCase("!go"))) {
             return;
         }
+
         // prompt if no opponent is chosen
-        List<User> mentioned = event.getMessage().getMentionedUsers();
-        int numPlayers = mentioned.size();
-        List<User> players = new ArrayList<>();
-        if (numPlayers > 0) {
-            players.add(event.getMessage().getAuthor());
-            players.addAll(mentioned);
-        } else {
+        List<User> users = new ArrayList<>();
+        users.add(event.getMessage().getAuthor());
+        for (User u : event.getMessage().getMentionedUsers()){
+            if(!(users.contains(u) || u.isBot())){
+                users.add(u);
+            }
+        }
+        if(users.size() < 2) {
             event.getChannel().sendMessage(
-                    new EmbedBuilder().setDescription("You have to choose at least one opponent. Challenge the other user with !gameon @<username>").setColor(Color.red).build()
+                    new EmbedBuilder().setDescription("You have to choose at least one opponent. Challenge the other user with !gameon @<username>\nYou cannot challenge bots or yourself.").setColor(Color.red).build()
             ).queue();
             return;
         }
 
         // Start new match
         if (MatchManager.getInstance().getMatchByChannel(event.getChannel())==null) {
-            Match m = new Match(event.getChannel(), players, 1);
+            Match m = new Match(event.getChannel(), users, 1);
             MatchManager.getInstance().addMatch(m.getChannel(), m);
         } else {
             event.getChannel().sendMessage(
