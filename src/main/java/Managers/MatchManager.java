@@ -1,6 +1,7 @@
 package Managers;
 
 import games.Match;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.util.HashMap;
@@ -31,12 +32,19 @@ public final class MatchManager {
         return instance;
     }
 
+    public int getNumberOfMatches(){
+        return instance.games.size();
+    }
+
     public void addMatch(TextChannel t, Match m){
         games.put(t,m);
+        t.getJDA().getPresence().setActivity(Activity.playing(getNumberOfMatches() + " games of darts"));
     }
 
     public void removeMatchByChannel(TextChannel t){
         games.remove(t);
+
+        t.getJDA().getPresence().setActivity(Activity.playing(getNumberOfMatches() + " games of darts"));
     }
 
     public Match getMatchByChannel(TextChannel t){

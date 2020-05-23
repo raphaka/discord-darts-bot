@@ -3,6 +3,7 @@ package games;
 import Entities.Player;
 import Managers.MatchManager;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -62,7 +63,6 @@ public class Match {
             eb.getFields().remove(2);
         }
         channel.sendMessage(eb.build()).queue();
-
     }
 
     //updates legs count for player, determines if/how game is finished + quits match or starts new leg

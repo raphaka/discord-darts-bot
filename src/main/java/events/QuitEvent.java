@@ -74,7 +74,7 @@ public class QuitEvent extends ListenerAdapter {
                 event.getChannel().sendMessage(eb.build()).queue();
             } else {
                 if (!gameExisted) {
-                    eb = new EmbedBuilder().setDescription("There is currently no match running").setColor(Color.red);
+                    eb = new EmbedBuilder().setDescription("There is currently no match running in this channel").setColor(Color.red);
                     event.getChannel().sendMessage(eb.build()).queue();
                 }
             }
