@@ -6,9 +6,13 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import sun.tools.java.ClassPath;
 
 import java.awt.*;
 import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +49,13 @@ public class MatchEvent extends ListenerAdapter {
                     new EmbedBuilder().setDescription(messageSent[1] + " is not a valid number of legs. Please set the number of legs with !bestof <legs> @<opponent>").setColor(Color.red).build()
             ).queue();
             return;
+        }else if(legs > 9000) {
+            event.getChannel().sendMessage(
+                    //Over 9000 meme from knowyourmeme.com
+                    new EmbedBuilder().setImage("https://i0.kym-cdn.com/entries/icons/original/000/000/056/itsover1000.jpg").build()
+            ).queue();
         }
+
         // prompt if no opponent is chosen
         List<User> users = new ArrayList<>();
         users.add(event.getMessage().getAuthor());
