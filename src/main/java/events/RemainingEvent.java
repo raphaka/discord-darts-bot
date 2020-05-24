@@ -11,37 +11,38 @@ import java.awt.*;
 
 public class RemainingEvent extends ListenerAdapter {
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-        String[] msg = event.getMessage().getContentRaw().split(" ");
-        if (msg.length < 2){
-            return;
-        }
-        if (msg[0].equalsIgnoreCase("remaining") || msg[0].equalsIgnoreCase("rest") || msg[0].equalsIgnoreCase("r")) {
-            int rem;
-            try{
-                rem = Integer.parseInt(msg[1]);
-            } catch (java.lang.NumberFormatException e) {
-                return;
-                // if message cannot be parsed as an Integer, it is not meant to be processed by this handler
-            }
-            // check if a match/game is currently running
-            Match m = MatchManager.getInstance().getMatchByChannel(event.getChannel());
-            if (m != null) {
-                GameX01 game = m.getCurrentGame();
-                if (game != null) {
-                    game.remaining(rem, event.getMessage().getAuthor());
+        String msg = event.getMessage().getContentRaw();
+        String[] keywords = new String[] {"r","rem","rest","remaining"};
+        for(String kw : keywords){
+            if (msg.toLowerCase().startsWith(kw)){
+                int rem;
+                try{
+                    rem = Integer.parseInt(msg.toLowerCase().replaceFirst(kw,"").trim());
+                } catch (java.lang.NumberFormatException e) {
+                    continue;
+                    // if message cannot be parsed as an Integer, it is not meant to be processed by this handler
+                }
+                // check if a match/game is currently running
+                Match m = MatchManager.getInstance().getMatchByChannel(event.getChannel());
+                if (m != null) {
+                    GameX01 game = m.getCurrentGame();
+                    if (game != null) {
+                        game.remaining(rem, event.getMessage().getAuthor());
+                    } else {
+                        event.getChannel().sendMessage(
+                                new EmbedBuilder().setDescription("There's currently no leg running in this channel. If you just started a match, type your score as the first player as is. The 'remaining' feature can be used as soon as the game starts.").setColor(Color.red).build()
+                        ).queue();
+                        System.err.println("No leg found in match " + m);
+                    }
                 } else {
-                    event.getChannel().sendMessage(
-                            new EmbedBuilder().setDescription("The leg cannot be continued due to an error. Has the Darts-Bot been restarted lately?").setColor(Color.red).build()
-                    ).queue();
-                    System.err.println("No leg found in match " + m);
+                    // Match not in hashmap, bot restarted?
+                    if (event.getGuild().getCategoriesByName("Dartboards", true).contains(event.getChannel().getParent())) {
+                        event.getChannel().sendMessage(
+                                new EmbedBuilder().setDescription("There's no match running in this server. Has the Darts-Bot been restarted lately?").setColor(Color.red).build()
+                        ).queue();
+                    }
                 }
-            } else {
-                // Match not in hashmap, bot restarted?
-                if (event.getGuild().getCategoriesByName("Dartboards", true).contains(event.getChannel().getParent())) {
-                    event.getChannel().sendMessage(
-                            new EmbedBuilder().setDescription("The match cannot be continued due to an error. Has the Darts-Bot been restarted lately?").setColor(Color.red).build()
-                    ).queue();
-                }
+                return;
             }
         }
     }
