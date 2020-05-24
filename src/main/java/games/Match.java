@@ -99,7 +99,7 @@ public class Match {
                 draw = false;
             }
             //update matchStats
-            player.finishLeg();
+            player.finishLeg(winner.getId().equals(player.getId()));
         }
         channel.sendMessage(eb.build()).queue();
 
@@ -122,6 +122,8 @@ public class Match {
         determineNextPlayer();
         //starter as param
         curGame = new GameX01(channel, this.players, intNextPlayer, startScore);
+        EmbedBuilder eb_newLeg = new EmbedBuilder().setColor(Color.green).setDescription(curGame.getPlayers().get(intNextPlayer).getName()).appendDescription(" to throw first.");
+        channel.sendMessage(eb_newLeg.build()).queue();
     }
 
     private void finishMatch(Player winner, boolean draw){
@@ -131,7 +133,7 @@ public class Match {
                 eb.setDescription("It's a draw.");
             }else{
                 if (winner != null){
-                    eb.setDescription(winner.getName()).appendDescription("won the match.");
+                    eb.setDescription(winner.getName()).appendDescription(" won the match.");
                 } else {
                     eb.setDescription("Match has finished.");
                 }
@@ -143,9 +145,9 @@ public class Match {
                 String matchStatsStr = "Legs: " + legs.get(p) +
                         " | Avg: " + String.format("%.2f", playerAvg) +
                         " | Highest: " + playerMatchStats.get("Highest") +
-                        " | Darts: " + playerMatchStats.get("Darts") +
-                        " | 100-139: " + playerMatchStats.get("100+") +
-                        " | 140-179: " + playerMatchStats.get("140+") +
+                        " | Best Leg: " + playerMatchStats.get("Best Leg") +
+                        " | 100+: " + playerMatchStats.get("100+") +
+                        " | 140+: " + playerMatchStats.get("140+") +
                         " | 180: " + playerMatchStats.get("180");
                 eb.addField(p.getName(), matchStatsStr, false);
             }

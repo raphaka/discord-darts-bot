@@ -14,7 +14,8 @@ public class CheckEvent extends ListenerAdapter {
         // parse if message check, c or checkout
         String msg = event.getMessage().getContentRaw();
         if (msg.toLowerCase().startsWith("check ") || msg.toLowerCase().startsWith("c ")
-                || msg.toLowerCase().startsWith("checkout ") || msg.toLowerCase().startsWith("gameshot")) {
+                || msg.toLowerCase().startsWith("checkout ") || msg.toLowerCase().startsWith("gameshot")
+                || msg.equalsIgnoreCase("c1") || msg.equalsIgnoreCase("c2") || msg.equalsIgnoreCase("c3") ) {
             // check if match/game is currently running in this channel
             Match m = MatchManager.getInstance().getMatchByChannel(event.getChannel());
             if (m != null) {

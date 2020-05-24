@@ -77,8 +77,13 @@ public class Player {
         legStats.put("180", 0);
     }
 
-    public void finishLeg(){
+    public void finishLeg(boolean isWinner){
         //add leg stats to match stats
+        if(isWinner){
+            if(legStats.get("Darts") < matchStats.get("Best Leg") || matchStats.get("Best Leg") == 0){
+                matchStats.put("Best Leg", legStats.get("Darts"));
+            }
+        }
         matchStats.put("Darts", matchStats.get("Darts") + legStats.get("Darts"));
         matchStats.put("Scored", matchStats.get("Scored") + legStats.get("Scored"));
         if(legStats.get("Highest") > matchStats.get("Highest")){
@@ -96,6 +101,7 @@ public class Player {
         matchStats.put("100+", 0);
         matchStats.put("140+", 0);
         matchStats.put("180", 0);
+        matchStats.put("Best Leg",0);
     }
 
     public HashMap<String, Integer> getLegStats(){
