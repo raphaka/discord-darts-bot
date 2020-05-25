@@ -37,10 +37,8 @@ public class StartScoreEvent extends ListenerAdapter {
                 //check if user is allowed to set start score
                 boolean allowed = false;
                 //check if user is a player of the match
-                for(Player p : m.getPlayers()){
-                    if (event.getAuthor().getId().equals(p.getId())) {
-                        allowed = true;
-                    }
+                if (m.hasUser(event.getAuthor())) {
+                    allowed = true;
                 }
                 //check if player has role referee
                 if (event.getGuild().getRolesByName("Referee", true).size() != 0) {

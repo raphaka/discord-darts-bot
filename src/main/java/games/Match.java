@@ -227,6 +227,15 @@ public class Match {
         return null;
     }
 
+    public boolean hasUser(User user){
+        for(Player p : players){
+            if (user.getId().equals(p.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public GameX01 getCurrentGame(){
         return this.curGame;
     }

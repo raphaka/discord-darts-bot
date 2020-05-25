@@ -14,7 +14,7 @@ public class RandomEvent extends ListenerAdapter {
         if (event.getGuild().getCategoriesByName("Dartboards", true).contains(event.getChannel().getParent())) {
             Match m = MatchManager.getInstance().getMatchByChannel(event.getChannel());
             if (m != null) {
-                if (m.isWaitingForStart()){
+                if (m.isWaitingForStart() && m.hasUser(event.getAuthor())){
                     m.startMatch(-1,event.getAuthor());
                 }
             }

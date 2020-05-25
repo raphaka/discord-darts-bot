@@ -24,22 +24,18 @@ public class ScoreEvent extends ListenerAdapter{
             // check if a match/game is currently running
             Match m = MatchManager.getInstance().getMatchByChannel(event.getChannel());
             if (m != null) {
-                //check if user is a player of the match
-                for(Player p : m.getPlayers()){
-                    if (event.getAuthor().getId().equals(p.getId())) {
-                        //get game and score
-                        GameX01 game = m.getCurrentGame();
-                        if (m.isWaitingForStart()){
-                            m.startMatch(points,event.getAuthor());
-                        } else if (game != null) {
-                            game.score(points, event.getAuthor());
-                        } else {
-                            event.getChannel().sendMessage(
-                                    new EmbedBuilder().setDescription("The leg cannot be continued due to an error. Has the Darts-Bot been restarted lately?").setColor(Color.red).build()
-                            ).queue();
-                            System.err.println("No leg found in match " + m);
-                        }
-                        return;
+                if (m.hasUser(event.getAuthor())) {
+                    //get game and score
+                    GameX01 game = m.getCurrentGame();
+                    if (m.isWaitingForStart()){
+                        m.startMatch(points,event.getAuthor());
+                    } else if (game != null) {
+                        game.score(points, event.getAuthor());
+                    } else {
+                        event.getChannel().sendMessage(
+                                new EmbedBuilder().setDescription("The leg cannot be continued due to an error. Has the Darts-Bot been restarted lately?").setColor(Color.red).build()
+                        ).queue();
+                        System.err.println("No leg found in match " + m);
                     }
                 }
             } else {

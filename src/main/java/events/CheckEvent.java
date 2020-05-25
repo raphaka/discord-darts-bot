@@ -19,24 +19,26 @@ public class CheckEvent extends ListenerAdapter {
             // check if match/game is currently running in this channel
             Match m = MatchManager.getInstance().getMatchByChannel(event.getChannel());
             if (m != null) {
-                GameX01 game = m.getCurrentGame();
-                if (game != null) {
-                    switch (msg.substring(msg.length() - 1)) {
-                        case "1":
-                            game.check(1, event.getMessage().getAuthor());
-                            break;
-                        case "2":
-                            game.check(2, event.getMessage().getAuthor());
-                            break;
-                        case "3":
-                            game.check(3, event.getMessage().getAuthor());
-                            break;
+                if(m.hasUser(event.getAuthor())) {
+                    GameX01 game = m.getCurrentGame();
+                    if (game != null) {
+                        switch (msg.substring(msg.length() - 1)) {
+                            case "1":
+                                game.check(1, event.getMessage().getAuthor());
+                                break;
+                            case "2":
+                                game.check(2, event.getMessage().getAuthor());
+                                break;
+                            case "3":
+                                game.check(3, event.getMessage().getAuthor());
+                                break;
+                        }
+                    } else {
+                        event.getChannel().sendMessage(
+                                new EmbedBuilder().setDescription("The leg cannot be continued due to an error. Has the Darts-Bot been restarted lately?").setColor(Color.red).build()
+                        ).queue();
+                        System.err.println("No leg found in match " + m);
                     }
-                } else {
-                    event.getChannel().sendMessage(
-                            new EmbedBuilder().setDescription("The leg cannot be continued due to an error. Has the Darts-Bot been restarted lately?").setColor(Color.red).build()
-                    ).queue();
-                    System.err.println("No leg found in match " + m);
                 }
             } else {
                 // Match not in hashmap, bot restarted?

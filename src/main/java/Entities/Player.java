@@ -38,7 +38,6 @@ public class Player {
     public int correctLast(int s){
         int newScore =  lastScore - s;
         int lastThrow = lastScore - currentScore;
-        System.out.println(lastThrow);
         //only save new score if it is valid
         if(newScore > 1){
             currentScore = newScore;

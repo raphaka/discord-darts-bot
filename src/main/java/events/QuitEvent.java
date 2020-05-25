@@ -57,15 +57,14 @@ public class QuitEvent extends ListenerAdapter {
             //loop through players of current game, if author is player: quit
             match = MatchManager.getInstance().getMatchByChannel(event.getChannel());
             if (match != null) {
-                EmbedBuilder finalEb2 = eb;
-                match.getPlayers().forEach(p -> {
-                    if (event.getAuthor().getId().equals(p.getId())) {
-                        MatchManager.getInstance().removeMatchByChannel(event.getChannel());
-                        event.getChannel().sendMessage(finalEb2.build()).queue();
-                    }
-                });
+                if (match.hasUser(event.getAuthor())) {
+                    MatchManager.getInstance().removeMatchByChannel(event.getChannel());
+                    event.getChannel().sendMessage(eb.build()).queue();
+                }
                 gameExisted = true;
-            }
+            };
+
+
 
             //prompt premission error if game couldn't be quit by admin or player
             match = MatchManager.getInstance().getMatchByChannel(event.getChannel());
