@@ -83,6 +83,9 @@ public class Player {
                 matchStats.put("Best Leg", legStats.get("Darts"));
             }
         }
+        if(legStats.get("Darts") > matchStats.get("Worst Leg")){
+            matchStats.put("Worst Leg", legStats.get("Darts"));
+        }
         matchStats.put("Darts", matchStats.get("Darts") + legStats.get("Darts"));
         matchStats.put("Scored", matchStats.get("Scored") + legStats.get("Scored"));
         if(legStats.get("Highest") > matchStats.get("Highest")){
@@ -101,6 +104,7 @@ public class Player {
         matchStats.put("140+", 0);
         matchStats.put("180", 0);
         matchStats.put("Best Leg",0);
+        matchStats.put("Worst Leg", 0);
     }
 
     public HashMap<String, Integer> getLegStats(){

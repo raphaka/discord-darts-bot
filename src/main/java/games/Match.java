@@ -146,6 +146,7 @@ public class Match {
                         " | Avg: " + String.format("%.2f", playerAvg) +
                         " | Highest: " + playerMatchStats.get("Highest") +
                         " | Best Leg: " + playerMatchStats.get("Best Leg") +
+                        " | Worst Leg: " + playerMatchStats.get("Worst Leg") +
                         " | 100+: " + playerMatchStats.get("100+") +
                         " | 140+: " + playerMatchStats.get("140+") +
                         " | 180: " + playerMatchStats.get("180");
