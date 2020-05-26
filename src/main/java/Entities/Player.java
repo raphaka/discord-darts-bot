@@ -25,6 +25,9 @@ public class Player {
             currentScore = newScore;
             legStats.put("Darts", legStats.get("Darts") + 3);
             legStats.put("Scored", legStats.get("Scored") + s);
+            if(legStats.get("Darts") <= 9){
+                legStats.put("First 9 Scored", legStats.get("Scored"));
+            }
             if(s == 180){ legStats.put("180", legStats.get("180") + 1); }
             if(s >= 140 && s <= 179){ legStats.put("140+", legStats.get("140+") + 1); }
             if(s >= 100 && s <= 140){ legStats.put("100+", legStats.get("100+") + 1); }
@@ -43,6 +46,7 @@ public class Player {
             currentScore = newScore;
             //recalculate score
             legStats.put("Scored", legStats.get("Scored") - lastThrow + s);
+            if(legStats.get("Darts") <= 9){ legStats.put("First 9 Scored", legStats.get("Scored")); }
             //reset counters of last throw
             if(lastThrow == 180){ legStats.put("180", legStats.get("180") - 1); }
             if(lastThrow >= 140 && lastThrow <= 179){ legStats.put("140+", legStats.get("140+") - 1); }
@@ -60,6 +64,9 @@ public class Player {
     public void check(int d){
         legStats.put("Darts", legStats.get("Darts") + d);
         legStats.put("Scored", legStats.get("Scored") + currentScore);
+        if(legStats.get("Darts") == 9){
+            legStats.put("First 9 Scored", legStats.get("Scored"));
+        }
         if(currentScore >= 140 && currentScore <= 170){ legStats.put("140+", legStats.get("140+") + 1); }
         if(currentScore >= 100 && currentScore <= 140){ legStats.put("100+", legStats.get("100+") + 1); }
         if(currentScore > legStats.get("Highest")){ legStats.put("Highest",currentScore); }
@@ -74,6 +81,7 @@ public class Player {
         legStats.put("100+", 0);
         legStats.put("140+", 0);
         legStats.put("180", 0);
+        legStats.put("First 9 Scored", 0);
     }
 
     public void finishLeg(boolean isWinner){
@@ -88,6 +96,7 @@ public class Player {
         }
         matchStats.put("Darts", matchStats.get("Darts") + legStats.get("Darts"));
         matchStats.put("Scored", matchStats.get("Scored") + legStats.get("Scored"));
+        matchStats.put("First 9 Scored", matchStats.get("First 9 Scored") + legStats.get("First 9 Scored"));
         if(legStats.get("Highest") > matchStats.get("Highest")){
             matchStats.put("Highest", legStats.get("Highest"));
         }
@@ -105,6 +114,7 @@ public class Player {
         matchStats.put("180", 0);
         matchStats.put("Best Leg",0);
         matchStats.put("Worst Leg", 0);
+        matchStats.put("First 9 Scored", 0);
     }
 
     public HashMap<String, Integer> getLegStats(){

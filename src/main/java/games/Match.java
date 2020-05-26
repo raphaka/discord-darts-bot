@@ -86,13 +86,15 @@ public class Match {
             //print leg stats
             HashMap<String, Integer> playerLegStats = player.getLegStats();
             double playerAvg = (double)playerLegStats.get("Scored")/playerLegStats.get("Darts")*3;
+            double first9Avg = (double)playerLegStats.get("First 9 Scored")/3;  //3 because scored/9 darts * 3
             String legStatsStr = "Legs: " + legs.get(player) +
                     " | Avg: " + String.format("%.2f", playerAvg) +
                     " | Highest: " + playerLegStats.get("Highest") +
                     " | Darts: " + playerLegStats.get("Darts") +
                     " | 100+: " + playerLegStats.get("100+") +
                     " | 140+: " + playerLegStats.get("140+") +
-                    " | 180: " + playerLegStats.get("180");
+                    " | 180: " + playerLegStats.get("180") +
+                    " | First-9-Avg: " + String.format("%.2f", first9Avg);
             eb.addField(player.getName(), legStatsStr, false);
             // determine if a player has different score than required for draw
             if (legs.get(player) != num_of_legs/players.size()){
@@ -142,6 +144,7 @@ public class Match {
                 //format MatchStats into embed field
                 HashMap<String, Integer> playerMatchStats = p.getMatchStats();
                 double playerAvg = (double) playerMatchStats.get("Scored") / playerMatchStats.get("Darts") * 3;
+                double first9Avg = (double) playerMatchStats.get("First 9 Scored")/(3*finished_legs); //3 because scored/9 darts * 3
                 String matchStatsStr = "Legs: " + legs.get(p) +
                         " | Avg: " + String.format("%.2f", playerAvg) +
                         " | Highest: " + playerMatchStats.get("Highest") +
@@ -149,7 +152,8 @@ public class Match {
                         " | Worst Leg: " + playerMatchStats.get("Worst Leg") +
                         " | 100+: " + playerMatchStats.get("100+") +
                         " | 140+: " + playerMatchStats.get("140+") +
-                        " | 180: " + playerMatchStats.get("180");
+                        " | 180: " + playerMatchStats.get("180") +
+                        " | First-9-Avg: " + String.format("%.2f", first9Avg);
                 eb.addField(p.getName(), matchStatsStr, false);
             }
             channel.sendMessage(eb.build()).queue();
