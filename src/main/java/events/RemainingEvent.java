@@ -22,7 +22,7 @@ public class RemainingEvent extends ListenerAdapter {
                     continue;
                     // if message cannot be parsed as an Integer, it is not meant to be processed by this handler
                 }
-                // check if a match/game is currently running
+                // check if a match/game is currently running and author is player
                 Match m = MatchManager.getInstance().getMatchByChannel(event.getChannel());
                 if (m != null) {
                     if(m.hasUser(event.getAuthor())) {
