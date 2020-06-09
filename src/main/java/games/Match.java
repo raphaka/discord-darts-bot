@@ -3,7 +3,6 @@ package games;
 import Entities.Player;
 import Managers.MatchManager;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -86,7 +85,7 @@ public class Match {
             //print leg stats
             HashMap<String, Integer> playerLegStats = player.getLegStats();
             double playerAvg = (double)playerLegStats.get("Scored")/playerLegStats.get("Darts")*3;
-            double first9Avg = (double)playerLegStats.get("First 9 Scored")/3;  //3 because scored/9 darts * 3
+            double first9Avg = (double)playerLegStats.get("First 9 Scored") / playerLegStats.get("First 9 Darts") * 3;
             String legStatsStr = "Legs: " + legs.get(player) +
                     " | Avg: " + String.format("%.2f", playerAvg) +
                     " | Highest: " + playerLegStats.get("Highest") +
@@ -144,7 +143,7 @@ public class Match {
                 //format MatchStats into embed field
                 HashMap<String, Integer> playerMatchStats = p.getMatchStats();
                 double playerAvg = (double) playerMatchStats.get("Scored") / playerMatchStats.get("Darts") * 3;
-                double first9Avg = (double) playerMatchStats.get("First 9 Scored")/(3*finished_legs); //3 because scored/9 darts * 3
+                double first9Avg = (double) playerMatchStats.get("First 9 Scored")/playerMatchStats.get("First 9 Darts") * 3; //3 because scored/9 darts * 3
                 String matchStatsStr = "Legs: " + legs.get(p) +
                         " | Avg: " + String.format("%.2f", playerAvg) +
                         " | Highest: " + playerMatchStats.get("Highest") +

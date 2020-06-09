@@ -1,6 +1,5 @@
 package events;
 
-import Entities.Player;
 import Managers.MatchManager;
 import games.Match;
 import net.dv8tion.jda.api.EmbedBuilder;

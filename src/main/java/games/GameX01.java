@@ -95,9 +95,6 @@ public class GameX01 {
             nextPlayer = players.get(intNextPlayer);
         }
         if (u.getId().equals(nextPlayer.getId())){
-            //waitingForCheck is only set when checkout is prompted by bot
-            //then only the player with curentscore == 0 can check
-            System.out.println(nextPlayer.getCurrentScore());
             int rem = nextPlayer.getCurrentScore();
             if (
                     (darts == 1 && rem < 41 && rem % 2 == 0) ||

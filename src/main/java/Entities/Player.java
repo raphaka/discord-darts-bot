@@ -20,13 +20,16 @@ public class Player {
     public int score(int s){
         int newScore = currentScore - s;
         lastScore = currentScore;
-        legStats.put("Darts", legStats.get("Darts") + 3);
+        if (newScore!=0){
+            legStats.put("Darts", legStats.get("Darts") + 3);
+        }
         //only save new score if it is valid
         if(newScore > 1){
             currentScore = newScore;
             legStats.put("Scored", legStats.get("Scored") + s);
             if(legStats.get("Darts") <= 9){
                 legStats.put("First 9 Scored", legStats.get("Scored"));
+                legStats.put("First 9 Darts", legStats.get("Darts"));
             }
             if(s == 180){ legStats.put("180", legStats.get("180") + 1); }
             if(s >= 140 && s <= 179){ legStats.put("140+", legStats.get("140+") + 1); }
@@ -48,7 +51,10 @@ public class Player {
                 currentScore = newScore;
                 //recalculate score
                 legStats.put("Scored", legStats.get("Scored") - lastThrow + s);
-                if(legStats.get("Darts") <= 9){ legStats.put("First 9 Scored", legStats.get("Scored")); }
+                if(legStats.get("Darts") <= 9){
+                    legStats.put("First 9 Scored", legStats.get("Scored"));
+                    legStats.put("First 9 Darts", legStats.get("Darts"));
+                }
                 //count new high scores
                 if(s == 180){ legStats.put("180", legStats.get("180") + 1); }
                 if(s >= 140 && s <= 179){ legStats.put("140+", legStats.get("140+") + 1); }
@@ -76,6 +82,7 @@ public class Player {
         legStats.put("Scored", legStats.get("Scored") + currentScore);
         if(legStats.get("Darts") == 9){
             legStats.put("First 9 Scored", legStats.get("Scored"));
+            legStats.put("First 9 Darts", 9);
         }
         if(currentScore >= 140 && currentScore <= 170){ legStats.put("140+", legStats.get("140+") + 1); }
         if(currentScore >= 100 && currentScore <= 140){ legStats.put("100+", legStats.get("100+") + 1); }
@@ -92,6 +99,7 @@ public class Player {
         legStats.put("140+", 0);
         legStats.put("180", 0);
         legStats.put("First 9 Scored", 0);
+        legStats.put("First 9 Darts", 0); //Counts if a player throws 9 darts or 6 because opponent scores 9darter
     }
 
     public void finishLeg(boolean isWinner){
@@ -107,6 +115,7 @@ public class Player {
         matchStats.put("Darts", matchStats.get("Darts") + legStats.get("Darts"));
         matchStats.put("Scored", matchStats.get("Scored") + legStats.get("Scored"));
         matchStats.put("First 9 Scored", matchStats.get("First 9 Scored") + legStats.get("First 9 Scored"));
+        matchStats.put("First 9 Darts", matchStats.get("First 9 Darts") + legStats.get("First 9 Darts"));
         if(legStats.get("Highest") > matchStats.get("Highest")){
             matchStats.put("Highest", legStats.get("Highest"));
         }
@@ -125,6 +134,7 @@ public class Player {
         matchStats.put("Best Leg",0);
         matchStats.put("Worst Leg", 0);
         matchStats.put("First 9 Scored", 0);
+        matchStats.put("First 9 Darts", 0);
     }
 
     public HashMap<String, Integer> getLegStats(){
