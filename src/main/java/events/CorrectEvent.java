@@ -28,7 +28,9 @@ public class CorrectEvent extends ListenerAdapter {
                     if(m.hasUser(event.getAuthor())){
                         GameX01 game = m.getCurrentGame();
                         if (game != null) {
-                            game.correction(cor, event.getMessage().getAuthor());
+                            if (game.getWaitingForCheck()==null) {
+                                game.correction(cor, event.getMessage().getAuthor());
+                            }
                         } else {
                             event.getChannel().sendMessage(
                                     new EmbedBuilder().setDescription("The leg cannot be continued due to an error. Has the Darts-Bot been restarted lately?").setColor(Color.red).build()

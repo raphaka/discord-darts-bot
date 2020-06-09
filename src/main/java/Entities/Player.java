@@ -19,11 +19,11 @@ public class Player {
     //returns the result of the throw, it has to be validated in the calling function
     public int score(int s){
         int newScore = currentScore - s;
+        lastScore = currentScore;
+        legStats.put("Darts", legStats.get("Darts") + 3);
         //only save new score if it is valid
         if(newScore > 1){
-            lastScore = currentScore;
             currentScore = newScore;
-            legStats.put("Darts", legStats.get("Darts") + 3);
             legStats.put("Scored", legStats.get("Scored") + s);
             if(legStats.get("Darts") <= 9){
                 legStats.put("First 9 Scored", legStats.get("Scored"));
@@ -38,25 +38,35 @@ public class Player {
         }
         return newScore;
     }
+
     public int correctLast(int s){
         int newScore =  lastScore - s;
         int lastThrow = lastScore - currentScore;
         //only save new score if it is valid
-        if(newScore > 1){
-            currentScore = newScore;
-            //recalculate score
-            legStats.put("Scored", legStats.get("Scored") - lastThrow + s);
-            if(legStats.get("Darts") <= 9){ legStats.put("First 9 Scored", legStats.get("Scored")); }
+        if(newScore > 1 || newScore == 0){
+            if (newScore > 1) {
+                currentScore = newScore;
+                //recalculate score
+                legStats.put("Scored", legStats.get("Scored") - lastThrow + s);
+                if(legStats.get("Darts") <= 9){ legStats.put("First 9 Scored", legStats.get("Scored")); }
+                //count new high scores
+                if(s == 180){ legStats.put("180", legStats.get("180") + 1); }
+                if(s >= 140 && s <= 179){ legStats.put("140+", legStats.get("140+") + 1); }
+                if(s >= 100 && s <= 140){ legStats.put("100+", legStats.get("100+") + 1); }
+                if(s > legStats.get("Highest")){ legStats.put("Highest",s); }
+            } else {
+                //check(int,User) validates the shot by using the score before the checkout
+                currentScore = lastScore;
+                //reset number of thrown darts from last throw when correcting to checkout
+                legStats.put("Darts", legStats.get("Darts") - 3);
+                //reset score to last throw
+                legStats.put("Scored", legStats.get("Scored") - lastThrow);
+            }
             //reset counters of last throw
             if(lastThrow == 180){ legStats.put("180", legStats.get("180") - 1); }
             if(lastThrow >= 140 && lastThrow <= 179){ legStats.put("140+", legStats.get("140+") - 1); }
             if(lastThrow >= 100 && lastThrow <= 140){ legStats.put("100+", legStats.get("100+") - 1); }
             if(lastThrow == legStats.get("Highest")){ legStats.put("Highest",lastHighest); }
-            //count new high scores
-            if(s == 180){ legStats.put("180", legStats.get("180") + 1); }
-            if(s >= 140 && s <= 179){ legStats.put("140+", legStats.get("140+") + 1); }
-            if(s >= 100 && s <= 140){ legStats.put("100+", legStats.get("100+") + 1); }
-            if(s > legStats.get("Highest")){ legStats.put("Highest",s); }
         }
         return newScore;
     }

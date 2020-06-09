@@ -15,13 +15,20 @@ public class CheckEvent extends ListenerAdapter {
         String msg = event.getMessage().getContentRaw();
         if (msg.toLowerCase().startsWith("check ") || msg.toLowerCase().startsWith("c ")
                 || msg.toLowerCase().startsWith("checkout ") || msg.toLowerCase().startsWith("gameshot")
-                || msg.equalsIgnoreCase("c1") || msg.equalsIgnoreCase("c2") || msg.equalsIgnoreCase("c3") ) {
+                || msg.equalsIgnoreCase("c1") || msg.equalsIgnoreCase("c2") || msg.equalsIgnoreCase("c3")
+                || msg.equals("1") || msg.equals("2") || msg.equals("3") ) {
             // check if match/game is currently running in this channel
             Match m = MatchManager.getInstance().getMatchByChannel(event.getChannel());
             if (m != null) {
                 if(m.hasUser(event.getAuthor())) {
                     GameX01 game = m.getCurrentGame();
                     if (game != null) {
+                        //single numbers only trigger checkout if they are expected because the player's score is 0
+                        //return if another player types 1,2 or 3
+                        if ( (msg.equals("1") || msg.equals("2") || msg.equals("3"))
+                                && !game.getWaitingForCheck().getId().equals(event.getAuthor().getId())){
+                            return;
+                        }
                         switch (msg.substring(msg.length() - 1)) {
                             case "1":
                                 game.check(1, event.getMessage().getAuthor());

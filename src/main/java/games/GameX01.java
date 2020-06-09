@@ -17,6 +17,7 @@ public class GameX01 {
     private final TextChannel channel;
     private int intNextPlayer;
     private final List<Player> players;
+    private Player waitingForCheck = null;
 
     /*
      * Constructor sets the channel to be used.
@@ -81,20 +82,34 @@ public class GameX01 {
     // end game with checkout
     // validate if score is possible with the given amount of darts
     public void check(int darts, User u){
-        Player nextPlayer = players.get(intNextPlayer);
+        Player nextPlayer = null;
+        if (waitingForCheck == getPlayerByUser(u)){
+            //currently waiting for checkout by this user
+            nextPlayer = getPlayerByUser(u);
+        } else if (waitingForCheck != null){
+            //currently waiting for checkout by another user
+            return;
+        }
+        //player is the regular next player
+        if (nextPlayer == null){
+            nextPlayer = players.get(intNextPlayer);
+        }
         if (u.getId().equals(nextPlayer.getId())){
+            //waitingForCheck is only set when checkout is prompted by bot
+            //then only the player with curentscore == 0 can check
+            System.out.println(nextPlayer.getCurrentScore());
             int rem = nextPlayer.getCurrentScore();
-            if  (
-                (darts == 1 && rem<41 && rem%2==0) ||
-                (darts == 2 && (rem<99 || Arrays.stream(new int[]{100,101,104,107,110}).anyMatch(notbogey-> notbogey == rem))) ||
-                (darts == 3 && (rem<159 || Arrays.stream(new int[]{170,167,164,161,160}).anyMatch(notbogey-> notbogey == rem)))
-            ){
+            if (
+                    (darts == 1 && rem < 41 && rem % 2 == 0) ||
+                            (darts == 2 && (rem < 99 || Arrays.stream(new int[]{100, 101, 104, 107, 110}).anyMatch(notbogey -> notbogey == rem))) ||
+                            (darts == 3 && (rem < 159 || Arrays.stream(new int[]{170, 167, 164, 161, 160}).anyMatch(notbogey -> notbogey == rem)))
+            ) {
                 nextPlayer.check(darts);
                 MatchManager.getInstance().getMatchByChannel(channel).playerWonLeg(nextPlayer, darts);
             } else {
                 EmbedBuilder eb = new EmbedBuilder().setColor(Color.red).setDescription("Your score of " + rem
                         + " cannot be finished with " + darts);
-                if(darts == 1){
+                if (darts == 1) {
                     eb.appendDescription(" dart.");
                 } else {
                     eb.appendDescription(" darts.");
@@ -133,9 +148,10 @@ public class GameX01 {
      * validates score to avoid impossible values
      */
     private void validateScore(Player nextPlayer, int newScore, boolean switchPlayer){
+        waitingForCheck = null;
         if (newScore == 0){
-            channel.sendMessage("Finish the game by typing \"check\" and the number of darts needed, e.g. \"check 2.\n " +
-                    "You can also type \"c 1\", \"c 2\" or \"c 3\" to save time.").queue();
+            channel.sendMessage("How many darts did you use to check out?").queue();
+            waitingForCheck = nextPlayer;
         } else if (newScore < 0 || newScore == 1) {
             MessageAction msg = channel.sendMessage("Busted! <@").append(nextPlayer.getId()).append("> has ").append(String.valueOf(nextPlayer.getCurrentScore())).append(" left.");
             if(switchPlayer) {
@@ -171,6 +187,9 @@ public class GameX01 {
 
     public List<Player> getPlayers() {
         return players;
+    }
+    public Player getWaitingForCheck() {
+        return waitingForCheck;
     }
 }
 

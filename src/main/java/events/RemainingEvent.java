@@ -28,7 +28,9 @@ public class RemainingEvent extends ListenerAdapter {
                     if(m.hasUser(event.getAuthor())) {
                         GameX01 game = m.getCurrentGame();
                         if (game != null) {
-                            game.remaining(rem, event.getMessage().getAuthor());
+                            if (game.getWaitingForCheck()==null) {
+                                game.remaining(rem, event.getMessage().getAuthor());
+                            }
                         } else {
                             event.getChannel().sendMessage(
                                     new EmbedBuilder().setDescription("There's currently no leg running in this channel. If you just started a match, type your score as the first player as is. The 'remaining' feature can be used as soon as the game starts.").setColor(Color.red).build()

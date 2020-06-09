@@ -5,8 +5,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.awt.*;
-import java.io.File;
-import java.util.Scanner;
+
 
 public class HelpEvent extends ListenerAdapter {
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
@@ -18,7 +17,7 @@ public class HelpEvent extends ListenerAdapter {
                     .addField("remaining <number>", "your remaining score is <number> points (aliases: r <number>, rest <number>)", false)
                     .addField("check <number>", "you checked out with Y darts (alias: c Y)",false)
                     .addField("correct <number>", "correct the value of your last throw to <number>", false)
-                    .addField("!quit", "abandon the current match", false)
+                    .addField("!quit", "abandon the current match (alias: !stop)", false)
                     .setTitle("Available commands");
             event.getChannel().sendMessage(eb.build()).queue();
         }

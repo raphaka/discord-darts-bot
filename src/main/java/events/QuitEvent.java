@@ -13,7 +13,8 @@ import java.awt.*;
  */
 public class QuitEvent extends ListenerAdapter {
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-        if (event.getMessage().getContentRaw().equalsIgnoreCase("!quit")){
+        if (event.getMessage().getContentRaw().equalsIgnoreCase("!quit") ||
+                event.getMessage().getContentRaw().equalsIgnoreCase("!stop")){
 
             //set to true if the game is found. If the game is quit during this function, there will be no prompt that no game has been found
             boolean gameExisted = false;
@@ -62,7 +63,7 @@ public class QuitEvent extends ListenerAdapter {
                     event.getChannel().sendMessage(eb.build()).queue();
                 }
                 gameExisted = true;
-            };
+            }
 
 
 

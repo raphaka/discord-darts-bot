@@ -1,6 +1,5 @@
 package events;
 
-import Entities.Player;
 import Managers.MatchManager;
 import games.GameX01;
 import games.Match;
@@ -30,7 +29,9 @@ public class ScoreEvent extends ListenerAdapter{
                     if (m.isWaitingForStart()){
                         m.startMatch(points,event.getAuthor());
                     } else if (game != null) {
-                        game.score(points, event.getAuthor());
+                        if (game.getWaitingForCheck()==null) {
+                            game.score(points, event.getAuthor());
+                        }
                     } else {
                         event.getChannel().sendMessage(
                                 new EmbedBuilder().setDescription("The leg cannot be continued due to an error. Has the Darts-Bot been restarted lately?").setColor(Color.red).build()

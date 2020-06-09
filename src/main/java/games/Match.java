@@ -247,9 +247,6 @@ public class Match {
     public TextChannel getChannel(){
         return this.channel;
     }
-    public Set<Player> getPlayers(){
-        return legs.keySet();
-    }
     public boolean isWaitingForStart() {
         return waitingForStart;
     }
